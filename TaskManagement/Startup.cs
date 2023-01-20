@@ -1,15 +1,22 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TaskManagement.Contracts;
+using TaskManagement.Controllers;
+using TaskManagement.Models;
 using TaskManagement.Repository;
 using TaskManagement.Service;
 
@@ -48,7 +55,7 @@ namespace TaskManagement
                     };
                 });
             services.AddAutoMapper(typeof(Startup));
-            services.AddDbContext<AddressBookContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AddressBookDB")));
+            services.AddDbContext<TaskManagementContext>(options => options.UseSqlServer(Configuration.GetConnectionString("TaskManagement")));
             services.AddControllers();
             services.AddTransient<ITaskManagementRepository, TaskManagementRepository>();
             services.AddTransient<ITaskManagementService, TaskManagementService>();
@@ -58,7 +65,7 @@ namespace TaskManagement
             });
 
             var serviceProvider = services.BuildServiceProvider();
-            var logger = serviceProvider.GetService<ILogger<AddressBookController>>();
+            var logger = serviceProvider.GetService<ILogger<TaskManagementController>>();
             services.AddSingleton(typeof(ILogger), logger);
             services.AddControllersWithViews()
             .AddNewtonsoftJson(options =>

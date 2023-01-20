@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,12 @@ namespace TaskManagement.Controllers
     public class TaskManagementController : ControllerBase
     {
         private readonly ITaskManagementService _taskManagementService;
+        private readonly ILogger _logger;
 
-        public TaskManagementController(ITaskManagementService taskManagementService)
+        public TaskManagementController(ITaskManagementService taskManagementService, ILogger logger)
         {
             _taskManagementService = taskManagementService;
+            _logger = logger;
         }
 
         ///<summary>
@@ -31,16 +34,20 @@ namespace TaskManagement.Controllers
         [Route("api/auth/signin")]
         public IActionResult VerifyUser([FromBody] LoginDTO loginDTO)
         {
-            ErrorDTO isUserExist = _taskManagementService.IsUserExist(loginDTO.UserName);
-            if(isUserExist != null)
+            _logger.LogInformation("Verifying user started");
+            if (!ModelState.IsValid)
             {
-                return StatusCode(404, isUserExist);
+                _logger.LogError("Entered wrong log in data");
+                ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
+                return BadRequest(badRequest);
             }
             LogInResponseDTO isUserValid = _taskManagementService.VerifyUser(loginDTO);
             if(isUserValid == null)
             {
-                return StatusCode(401,isUserValid);
+                _logger.LogError("Invalid login details");
+                return StatusCode(401,new ErrorDTO() {type="User",description="Invalid log in details" });
             }
+            _logger.LogInformation("User verified successfully");
             return Ok(isUserValid);
         }
 
@@ -49,24 +56,23 @@ namespace TaskManagement.Controllers
         ///</summary>
         ///<param name="key"></param>
         ///<returns>List<MetaDataResponse> </returns>
-        [HttpPost]
+        [HttpGet]
         [Route("api/meta-data/ref-set/{key}")]
-        public IActionResult GetMetaDataList(string key)
+        public IActionResult GetMetaDataList([FromRoute]string key)
         {
-           // _logger.LogInformation("geting refset data started");
+            _logger.LogInformation("Getting refset data started");
             List<MetaDataResponse> response = _taskManagementService.GetRefSetData(key);
             if (response == null)
             {
-                return NotFound(new ErrorDTO
-                {
-                    type = "key",
-                    description = key + " key not exists in database"
-                });
+                _logger.LogError("key not found");
+                return NotFound(new ErrorDTO{type = "key",description = key + " key not exists in database"});
             }
             if (response.Count == 0)
             {
+                _logger.LogError("No content");
                 return NoContent();
             }
+            _logger.LogInformation("Fetched list of meta-data successfully");
             return Ok(response);
         }
 
@@ -79,17 +85,20 @@ namespace TaskManagement.Controllers
         [Route("api/Task")]
         public IActionResult CreateTask([FromBody] CreateTaskDTO task )
         {
+            _logger.LogInformation("Create Task started");
             if (!ModelState.IsValid)
             {
-               // _logger.LogError("Entered wrong login data");
+                _logger.LogError("Entered wrong Task data");
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
             Guid? id = _taskManagementService.CreateTask(task); 
             if(id == null)
             {
+                _logger.LogError("Task name already exits");
                 return StatusCode(409, new ErrorDTO() { type = "Task", description = "Task with the name already exist" });
             }
+            _logger.LogInformation("Created Task successfully");
             return Ok(id);
         }
 
@@ -102,16 +111,20 @@ namespace TaskManagement.Controllers
         public IActionResult GetTaskDetails([FromQuery(Name = Constants.userId)] Guid userId,[FromQuery] int size =Constants.pageSize, [FromQuery(Name = Constants.pageno)] int pageNo = Constants.pageNo, 
             [FromQuery(Name = Constants.sortby)] string sortBy = Constants.firstName, [FromQuery(Name = Constants.sortorder)] string sortOrder = Constants.ASC )
         {
+            _logger.LogInformation("Getting list of task started");
             ErrorDTO isUserIdExist = _taskManagementService.IsUserIdExist(userId);
             if(isUserIdExist != null)
             {
+                _logger.LogError("User id not found");
                 return StatusCode(404, isUserIdExist);
             }
             List<GetTaskDTO> task = _taskManagementService.GetTaskList(userId, size, pageNo, sortBy, sortOrder);
             if(task == null)
             {
+                _logger.LogError("No Conent");
                 return StatusCode(201,"No Content");
             }
+            _logger.LogInformation("List of task details fetched successfully");
             return Ok(task);
         }
 
@@ -124,11 +137,14 @@ namespace TaskManagement.Controllers
         [Route("api/task/{id}")]
         public IActionResult GetSingleTask([FromRoute] Guid id)
         {
+            _logger.LogInformation("Getting single task started");
             GetSingleTaskDTO response = _taskManagementService.GetSingleTask(id);
             if(response == null)
             {
+                _logger.LogError("Task id not found");
                 return StatusCode(404, new ErrorDTO() {type="Task",description="Task id not found" });
             }
+            _logger.LogInformation("Fetched single task successfully");
             return Ok(response);
         }
 
@@ -139,16 +155,26 @@ namespace TaskManagement.Controllers
         [Route("api/task/{id}")]
         public IActionResult UpdateTask([FromBody] Guid id,[FromBody] UpdateTaskDTO task)
         {
+            _logger.LogInformation("Updated Task started");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Entered wrong Task data");
+                ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
+                return BadRequest(badRequest);
+            }
             ErrorDTO isTaskExist = _taskManagementService.IsTaskExist(id,task);
             if(isTaskExist != null)
             {
+                _logger.LogError("Task id not found");
                 return StatusCode(404,isTaskExist);
             }
             ErrorDTO response = _taskManagementService.UpdateTask(id,task);
             if(response != null)
             {
+                _logger.LogError("Task name already exist");
                 return StatusCode(409,response);
             }
+            _logger.LogInformation("Task has been updated successfully");
             return Ok("Task has been updated successfully");
         }
 
@@ -159,11 +185,14 @@ namespace TaskManagement.Controllers
         [Route("api/task/{id}")]
         public IActionResult DeleteTask([FromRoute] Guid id)
         {
+            _logger.LogInformation("Delete Task started");
             ErrorDTO response = _taskManagementService.DeleteTask(id);
             if(response != null)
             {
+                _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
+            _logger.LogInformation("Task has been deleted successfully");
             return Ok("Task has been deleted successfully");
         }
 
@@ -174,12 +203,21 @@ namespace TaskManagement.Controllers
         [Route("api/task/{id}/status")]
         public IActionResult UpdateStatus([FromRoute]Guid id ,[FromBody]Guid statusId)
         {
+            _logger.LogInformation("Update Task status started");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Entered wrong status data");
+                ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
+                return BadRequest(badRequest);
+            }
             ErrorDTO response = _taskManagementService.IsUpdateTaskStatusExist(id, statusId);
             if(response != null)
             {
+                _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
             _taskManagementService.UpdateStatus(id,statusId);
+            _logger.LogInformation("Task status updated successfully");
             return Ok("Task status updated successfully");
         }
 
@@ -190,12 +228,21 @@ namespace TaskManagement.Controllers
         [Route("api/task/{id}/reminder")]
         public IActionResult UpdateRemainder([FromRoute]Guid id,[FromBody]Guid remainderId )
         {
+            _logger.LogInformation("Update task remainder started");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Entered wrong remainder data");
+                ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
+                return BadRequest(badRequest);
+            }
             ErrorDTO response = _taskManagementService.IsUpdateRemainder(id,remainderId);
             if(response != null)
             {
+                _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
             _taskManagementService.UpdateRemainder(id,remainderId);
+            _logger.LogInformation("Task remainder added successfully");
             return Ok("Task remainder added successfully");
         }
 
@@ -206,11 +253,14 @@ namespace TaskManagement.Controllers
         [Route("api/assignee")]
         public IActionResult GetAssigneeList()
         {
+            _logger.LogInformation("Getting list of assignee started");
             List<Assignee> assignees = _taskManagementService.GetAssigneeList();
             if (assignees == null)
             {
+                _logger.LogError("No Content");
                 return StatusCode(201, "No Content");
             }
+            _logger.LogInformation("Fetched list of assignee successfully");
             return Ok(assignees);
         }
 

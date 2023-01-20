@@ -46,6 +46,8 @@ namespace TaskManagement.Models
                 RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
                 list.Add(refObj);
             }
+            modelBuilder.Entity<RefTerm>()
+            .HasData(list);
 
             string refSetTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\RefSetTerm.csv";
             string refSetTermCSV = File.ReadAllText(refSetTermPath);
@@ -54,9 +56,12 @@ namespace TaskManagement.Models
             foreach (string item in RefSetTermdata)
             {
                 string[] row = item.Split(",");
-                RefSetTerm refObj = new RefSetTerm() {Id=Guid.Parse(row[0]),RefSetId=Guid.Parse(row[1]),RefTermId=Guid.Parse(row[2]) };
+                RefSetTerm refObj = new RefSetTerm() {Id=Guid.NewGuid(),RefSetId=Guid.Parse(row[0]),RefTermId=Guid.Parse(row[1]) };
                 SetRefTermlist.Add(refObj);
             }
+            modelBuilder.Entity<RefSetTerm>()
+            .HasData(SetRefTermlist);
+
 
             string refSetPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\RefSetData.csv";
             string refSetCSV = File.ReadAllText(refSetPath);
@@ -68,11 +73,14 @@ namespace TaskManagement.Models
                 RefSet refObj = new RefSet { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
                 refSetList.Add(refObj);
             }
+            modelBuilder.Entity<RefSet>()
+            .HasData(refSetList);
+
 
             string loginPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\LoginData.csv";
             string loginCSV = File.ReadAllText(loginPath);
             string[] LoginData = loginCSV.Split('\r');
-            List<LoginDTO> LoginList = new List<LoginDTO>();
+            List<User> LoginList = new List<User>();
             foreach (string item in LoginData)
             {
                 string[] row = item.Split(",");
@@ -81,24 +89,30 @@ namespace TaskManagement.Models
                 byte[] inputbuffer = Encoding.Unicode.GetBytes(row[1]);
                 byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
                 string EncryptPassword = Convert.ToBase64String(outputBuffer);
-                LoginDTO loginDTO = new LoginDTO()
+                User user = new User()
                 {
+                    Id = Guid.NewGuid(),
                     UserName=row[0],
                     Password= EncryptPassword
                 };
-                LoginList.Add(loginDTO);
+                LoginList.Add(user);
             }
+            modelBuilder.Entity<User>()
+            .HasData(LoginList);
 
-            string assigneeDataPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\RefSetData.csv";
+            string assigneeDataPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\AssigneeData.csv";
             string assigneeCSV = File.ReadAllText(assigneeDataPath);
             string[] assigneedata = assigneeCSV.Split('\r');
+            string[] dataRow = assigneeCSV.Split(",");
             List<Assignee> assigneeList = new List<Assignee>();
-            foreach (string item in assigneedata)
+            foreach (string item in dataRow)
             {
-                string[] row = item.Split(",");
-                Assignee refObj = new Assignee { Id = Guid.Parse(row[0]), Name = row[1].ToString()};
+                Assignee refObj = new Assignee { Id = Guid.NewGuid(), Name = item};
                 assigneeList.Add(refObj);
             }
+            modelBuilder.Entity<Assignee>()
+            .HasData(assigneeList);
+
         }
     }
 }

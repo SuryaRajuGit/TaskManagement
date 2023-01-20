@@ -45,7 +45,10 @@ namespace TaskManagement.Service
         public LogInResponseDTO VerifyUser(LoginDTO loginDTO)
         {
             string encryptPassword = _taskManagementRepository.GetPassword(loginDTO.UserName);
-
+            if(encryptPassword == null)
+            {
+                return null;
+            }
             SymmetricAlgorithm algorithm = DES.Create();
             ICryptoTransform transform = algorithm.CreateDecryptor(this.key, this.iv);
             byte[] inputbuffer = Convert.FromBase64String(encryptPassword);
@@ -127,7 +130,11 @@ namespace TaskManagement.Service
             {
                 return null;
             }
-            return _taskManagementRepository.SaveTask(task);
+            Tasks tasks = new Tasks()
+            {
+                Id=Guid.NewGuid(),
+            };
+            return _taskManagementRepository.SaveTask(tasks);
         }
 
         ///<summary>

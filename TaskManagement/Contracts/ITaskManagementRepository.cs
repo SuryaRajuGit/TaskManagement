@@ -51,5 +51,11 @@ namespace TaskManagement.Contracts
 
         public List<Assignee> GetAssigneeList();
 
+        public bool IsAssignerExist(Guid id);
+
+        public bool IsUpdateTaskNameExist(string name,Guid id);
+
+        public void AddAssigneeList(List<TaskMapAssignee> listAssignee,Guid id);
+
     }
 }

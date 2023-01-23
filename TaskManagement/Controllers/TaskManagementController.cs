@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TaskManagement.Contracts;
 using TaskManagement.Dtos;
@@ -12,8 +15,9 @@ using TaskManagement.Entities.Models;
 
 namespace TaskManagement.Controllers
 {
-    [Route("api/[controller]")]
+   
     [ApiController]
+    //[Authorize(AuthenticationSchemes = "Bearer")]
     public class TaskManagementController : ControllerBase
     {
         private readonly ITaskManagementService _taskManagementService;
@@ -30,6 +34,7 @@ namespace TaskManagement.Controllers
         ///</summary>
         ///<param name="loginDTO"></param>
         ///<returns>LogInResponseDTO</returns>
+        [AllowAnonymous]
         [HttpPost]
         [Route("api/auth/signin")]
         public IActionResult VerifyUser([FromBody] LoginDTO loginDTO)
@@ -85,12 +90,21 @@ namespace TaskManagement.Controllers
         [Route("api/Task")]
         public IActionResult CreateTask([FromBody] CreateTaskDTO task )
         {
-            _logger.LogInformation("Create Task started");
-            if (!ModelState.IsValid)
+            ErrorDTO response = _taskManagementService.IsDateInvalid(task.DueDate,task.StartDate);
+            if (response != null)
+            {
+                return BadRequest(response);
+            }
+            if (!ModelState.IsValid )
             {
                 _logger.LogError("Entered wrong Task data");
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
+            }
+            ErrorDTO isMetdaDataValid = _taskManagementService.CheckMetadata(task);
+            if(isMetdaDataValid != null)
+            {
+                return NotFound(isMetdaDataValid);
             }
             Guid? id = _taskManagementService.CreateTask(task); 
             if(id == null)
@@ -153,7 +167,7 @@ namespace TaskManagement.Controllers
         ///</summary>
         [HttpPut]
         [Route("api/task/{id}")]
-        public IActionResult UpdateTask([FromBody] Guid id,[FromBody] UpdateTaskDTO task)
+        public IActionResult UpdateTask([FromRoute] Guid id,[FromBody] UpdateTaskDTO task)
         {
             _logger.LogInformation("Updated Task started");
             if (!ModelState.IsValid)
@@ -201,7 +215,7 @@ namespace TaskManagement.Controllers
         ///</summary>
         [HttpPut] 
         [Route("api/task/{id}/status")]
-        public IActionResult UpdateStatus([FromRoute]Guid id ,[FromBody]Guid statusId)
+        public IActionResult UpdateStatus([FromRoute]Guid id ,[FromBody]StatusDTO statusDTO)
         {
             _logger.LogInformation("Update Task status started");
             if (!ModelState.IsValid)
@@ -210,13 +224,13 @@ namespace TaskManagement.Controllers
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
-            ErrorDTO response = _taskManagementService.IsUpdateTaskStatusExist(id, statusId);
+            ErrorDTO response = _taskManagementService.IsUpdateTaskStatusExist(id, statusDTO.status);
             if(response != null)
             {
                 _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
-            _taskManagementService.UpdateStatus(id,statusId);
+            _taskManagementService.UpdateStatus(id,statusDTO.status);
             _logger.LogInformation("Task status updated successfully");
             return Ok("Task status updated successfully");
         }
@@ -225,8 +239,8 @@ namespace TaskManagement.Controllers
         /// Updates Task remainder
         ///</summary>
         [HttpPut]
-        [Route("api/task/{id}/reminder")]
-        public IActionResult UpdateRemainder([FromRoute]Guid id,[FromBody]Guid remainderId )
+        [Route("api/task/{id}/remainder")]
+        public IActionResult UpdateRemainder([FromRoute]Guid id,[FromBody] RemainderDTO remainderDTO )
         {
             _logger.LogInformation("Update task remainder started");
             if (!ModelState.IsValid)
@@ -235,13 +249,13 @@ namespace TaskManagement.Controllers
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
-            ErrorDTO response = _taskManagementService.IsUpdateRemainder(id,remainderId);
+            ErrorDTO response = _taskManagementService.IsUpdateRemainder(id, remainderDTO.remainder_period);
             if(response != null)
             {
                 _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
-            _taskManagementService.UpdateRemainder(id,remainderId);
+            _taskManagementService.UpdateRemainder(id, remainderDTO.remainder_period);
             _logger.LogInformation("Task remainder added successfully");
             return Ok("Task remainder added successfully");
         }

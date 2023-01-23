@@ -58,7 +58,14 @@ namespace TaskManagement.Repository
         {
             return _taskManagementContext.Tasks.Any(find => find.Name == name);
         }
-
+        ///<summary>
+        /// Checks task name already exist or not
+        ///</summary>
+        ///<return>bool</return>
+        public bool IsUpdateTaskNameExist(string name,Guid id)
+        {
+            return _taskManagementContext.Tasks.Any(find => find.Name == name && find.Id != id);
+        }
         ///<summary>
         /// Saves task details
         ///</summary>
@@ -101,11 +108,22 @@ namespace TaskManagement.Repository
         ///<return>List<Tasks></return>
         public List<Tasks> GetTaskList(Guid id, int size, int pageNo)
         {
-            return _taskManagementContext.Tasks.Include(inc => inc.TaskMapAssignee)
-                .Where(find => find.Assigner == id || IsExist(find.TaskMapAssignee, id))
-                .Skip((pageNo - 1) * 5)
-                .Take(size)
-                .ToList();
+            List<Tasks> list = new List<Tasks>();
+            foreach (var item in _taskManagementContext.Tasks.Include(s => s.TaskMapAssignee).Skip((pageNo - 1) * 5).Take(size))
+            {
+                var c =  item.Assigner == id || item.TaskMapAssignee.Select(s => s.AssigneeId).ToList().Contains(id);
+                if (c)
+                {
+                    list.Add(item);
+                }
+            }
+            return list;
+            //var l = _taskManagementContext.Assignee.Select(sel => sel.Id).ToList();
+            //return _taskManagementContext.Tasks.Include(inc => inc.TaskMapAssignee)
+            //    .Where(find => find.Assigner == id || l.Contains(find.)) /*|| IsExist(find.TaskMapAssignee, id))*/
+            //    .Skip((pageNo - 1) * 5)
+            //    .Take(size)
+            //    .ToList();
         }
 
         ///<summary>
@@ -149,7 +167,8 @@ namespace TaskManagement.Repository
         ///<return>List<RefTerm></return>
         public Tasks GetTask(Guid id)
         {
-            return _taskManagementContext.Tasks.FirstOrDefault();
+
+            return _taskManagementContext.Tasks.Include(term => term.TaskMapAssignee).Where(find =>find.Id == id).FirstOrDefault();
         }
 
         ///<summary>
@@ -201,7 +220,9 @@ namespace TaskManagement.Repository
         ///</summary>
         public void UpdateTask(Tasks tasks)
         {
+            List<TaskMapAssignee> list =  _taskManagementContext.TaskMapAssignee.Where(find => find.TaskId == tasks.Id).ToList();
             _taskManagementContext.Tasks.Update(tasks);
+            _taskManagementContext.TaskMapAssignee.RemoveRange(list);
             _taskManagementContext.SaveChanges();
         }
 
@@ -217,6 +238,7 @@ namespace TaskManagement.Repository
                 return false;
             }
             _taskManagementContext.Tasks.Remove(task);
+            _taskManagementContext.SaveChanges();
             return true;
         }
 
@@ -256,6 +278,11 @@ namespace TaskManagement.Repository
         public List<Assignee> GetAssigneeList()
         {
             return _taskManagementContext.Assignee.ToList();
+        }
+
+        public bool IsAssignerExist(Guid id)
+        {
+            return _taskManagementContext.Assignee.Any(find => find.Id == id);
         }
     }
 }

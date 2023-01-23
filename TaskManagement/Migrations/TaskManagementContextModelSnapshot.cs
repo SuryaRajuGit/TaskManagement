@@ -35,17 +35,17 @@ namespace TaskManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f8c62d98-d864-42fe-9b61-0395a9200672"),
+                            Id = new Guid("f54a573c-0bf6-49c5-919e-cbca85017e5d"),
                             Name = "surya"
                         },
                         new
                         {
-                            Id = new Guid("ac659b0e-94d3-4e67-a889-30206023a31a"),
+                            Id = new Guid("d9c87627-8383-45e3-9b99-ae2a863840a2"),
                             Name = "raju"
                         },
                         new
                         {
-                            Id = new Guid("f0d538d9-d895-4537-9b9c-1586af709001"),
+                            Id = new Guid("e87f391c-e655-4d72-be4f-e14c0464f6e6"),
                             Name = "psr"
                         });
                 });
@@ -110,49 +110,49 @@ namespace TaskManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fe03c907-20d6-45c8-9000-a09884e71dd9"),
+                            Id = new Guid("5908f946-be02-41e8-a1f2-76a4e14ef86f"),
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("246b7c06-f7b8-49e6-873c-fcc337c2056a")
                         },
                         new
                         {
-                            Id = new Guid("02cbecbc-3479-4624-8a8c-035168adbb4a"),
+                            Id = new Guid("17b811d0-85e7-4a2d-8a08-b305ba6f744b"),
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("65a9194f-6e36-4451-ac6b-f8c3e2f2a794")
                         },
                         new
                         {
-                            Id = new Guid("d8243c78-fcf6-45c3-b531-48e3d8617ac6"),
+                            Id = new Guid("59035d53-14f4-4ad8-ad47-114f164e5820"),
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("d2c7f6ed-174f-4782-8207-ca847cb5e5ad")
                         },
                         new
                         {
-                            Id = new Guid("e3112d3e-3b92-456f-99b8-af50c5d28d93"),
+                            Id = new Guid("66c71898-b572-4ce9-8aff-b4f0b4635b07"),
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("031feee7-02c4-43f7-9269-b777ae5558d4")
                         },
                         new
                         {
-                            Id = new Guid("eb3d6aa1-59c6-4fa8-910d-f74e8f01a15b"),
+                            Id = new Guid("8f7eb77c-43a7-4a21-9748-35ec36ccaee8"),
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("5443d3e4-1cc2-49f9-af36-ec46c00c8844")
                         },
                         new
                         {
-                            Id = new Guid("8ef10d47-9e9d-47a2-bbd8-eda9e4317be3"),
+                            Id = new Guid("7a5321eb-c149-4aed-9b2f-c02a3e27571b"),
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("09cd2a9b-a3ef-4487-a37c-e076569cf752")
                         },
                         new
                         {
-                            Id = new Guid("ca1bc89b-3d15-41bb-8196-66f6cc15ab19"),
+                            Id = new Guid("d15431b8-d80b-4349-9557-de0dd7b559fd"),
                             RefSetId = new Guid("e28e09d8-76f8-43ba-be0b-d7eade3b1e6b"),
                             RefTermId = new Guid("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2")
                         },
                         new
                         {
-                            Id = new Guid("3b5aa52a-266c-47d1-b9bf-0ab6b9f93925"),
+                            Id = new Guid("4198fb0e-639c-441c-b951-eaa4168be472"),
                             RefSetId = new Guid("e28e09d8-76f8-43ba-be0b-d7eade3b1e6b"),
                             RefTermId = new Guid("cd2a89f8-dd1a-4a62-8802-1ec27c2c3980")
                         });
@@ -280,9 +280,6 @@ namespace TaskManagement.Migrations
                     b.Property<Guid>("Status")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.ToTable("Tasks");
@@ -307,7 +304,7 @@ namespace TaskManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("bb275fdd-2020-48bb-bbbc-e1af4e518802"),
+                            Id = new Guid("e4dc43e5-3159-4507-97a3-bcba72df5347"),
                             Password = "o4UhjEI94IFkRkJR59gnorDRPk49Rh8O",
                             UserName = "surya"
                         });

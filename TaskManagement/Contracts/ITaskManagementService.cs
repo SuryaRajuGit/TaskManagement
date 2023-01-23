@@ -43,5 +43,9 @@ namespace TaskManagement.Contracts
 
         public List<Assignee> GetAssigneeList();
 
+        public ErrorDTO IsDateInvalid(string datetime,string time);
+
+        public ErrorDTO CheckMetadata(CreateTaskDTO task);
+
     }
 }

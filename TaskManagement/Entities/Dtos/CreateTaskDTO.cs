@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,9 +12,11 @@ namespace TaskManagement.Entities.Dtos
 
         public string Description { get; set; }
 
-        public DateTime StartDate { get; set; }
+      //  [RegularExpression(@"^\d{4}-\d\d-\d\d \d\d-\d\d-\d\d")]
+        public string StartDate { get; set; }
 
-        public DateTime DueDate { get; set; }
+        
+        public string DueDate { get; set; }
 
         public Guid Priority { get; set; }
 
@@ -24,5 +27,7 @@ namespace TaskManagement.Entities.Dtos
         public Guid Status { get; set; }
 
         public Guid ParentTaskId { get; set; } 
+
+        public Guid ReminderPeriodId { get; set; }
     }
 }

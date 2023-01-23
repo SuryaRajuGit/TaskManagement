@@ -67,7 +67,7 @@ namespace TaskManagement.Service
                             new Claim(ClaimTypes.Name, loginDTO.UserName) ,
                         }
                         ),
-                    Expires = DateTime.UtcNow.AddMinutes(30),
+                    Expires = DateTime.UtcNow.AddMinutes(90),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
                 };
 
@@ -130,10 +130,39 @@ namespace TaskManagement.Service
             {
                 return null;
             }
+            DateTime startDate;
+            DateTime dueDate;
+            DateTime.TryParse(task.StartDate, out startDate);
+            DateTime.TryParse(task.DueDate, out dueDate);
+            Guid taskId = Guid.NewGuid();
             Tasks tasks = new Tasks()
             {
-                Id=Guid.NewGuid(),
+                Id=taskId,
+                Description=task.Description,
+                DueDate= startDate,
+                Assigner=task.Assigner,
+                Name=task.Name,
+                ParentTaskId=task.ParentTaskId,
+                Priority=task.Priority,
+                StartDate=dueDate,
+                Status=task.Status,
+                ReminderPeriodId=Guid.Empty,
+                TaskMapAssignee = new List<TaskMapAssignee>(),
+
             };
+            List<TaskMapAssignee> tasksList = new List<TaskMapAssignee>();
+            foreach (var item in task.Assignee)
+            {
+                TaskMapAssignee taskAssignee = new TaskMapAssignee()
+                {
+                    Id=Guid.NewGuid(),
+                    AssigneeId=item,
+                    TaskId = taskId
+                };
+                tasksList.Add(taskAssignee);
+            }
+            tasks.TaskMapAssignee.AddRange(tasksList);
+
             return _taskManagementRepository.SaveTask(tasks);
         }
 
@@ -203,19 +232,25 @@ namespace TaskManagement.Service
                         sortList = paginatedList.OrderBy(item => item.Priority).ToList();
                     }
                     break;
+                default:
+                    sortList = paginatedList;
+                    break;
             }
             List<RefTerm> termData = _taskManagementRepository.GetSetData();
             List<GetTaskDTO> taskList = new List<GetTaskDTO>();
             foreach (Tasks item in sortList)
             {
+                var x =  _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(each => each.AssigneeId).ToList());
+                var y = termData.Where(find => find.Id == item.Status).Select(sel => sel.Key).First();
+                var z = termData.Where(find => find.Id == item.Priority).Select(sel => sel.Key).First();
                 GetTaskDTO task = new GetTaskDTO()
                 {
                     Id = item.Id,
                     Name = item.Name,
                     Assignee = _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(each => each.AssigneeId).ToList()),
-                    Status = termData.Where(find => find.Id == id).Select(sel => sel.Key).First(),
+                    Status = termData.Where(find => find.Id == item.Status).Select(sel => sel.Key).First(),
                     DueDate=item.DueDate,
-                    Priority= termData.Where(find => find.Id == id).Select(sel => sel.Key).First()
+                    Priority= termData.Where(find => find.Id == item.Priority).Select(sel => sel.Key).First(),
                 };
                 taskList.Add(task);
             }
@@ -234,6 +269,8 @@ namespace TaskManagement.Service
             }
             List<Tasks> subTasks = _taskManagementRepository.GetSubTasks(id);
             List<RefTerm> termData = _taskManagementRepository.GetSetData();
+            List<Guid> ll = task.TaskMapAssignee.Select(each => each.AssigneeId).ToList();
+            List<string> l = _taskManagementRepository.GetAssigneeName(task.TaskMapAssignee.Select(each => each.AssigneeId).ToList());
             GetSingleTaskDTO getSingleTaskDTO = new GetSingleTaskDTO()
             {
                 Id = task.Id,
@@ -248,6 +285,8 @@ namespace TaskManagement.Service
                 SubTasks = new List<SubTaskDTO>()
             };
             List<SubTaskDTO> subTaskList = new List<SubTaskDTO>();
+
+
             foreach (Tasks item in subTasks)
             {
                 SubTaskDTO subTask = new SubTaskDTO()
@@ -272,6 +311,7 @@ namespace TaskManagement.Service
             {
                 return new ErrorDTO() {type="Task",description="Task id not found" };
             }
+            
             Guid userId = _taskManagementRepository.IsUserExist(updateTask.Assignee);
             if(userId != Guid.Empty)
             {
@@ -295,7 +335,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO UpdateTask(Guid id,UpdateTaskDTO updateTask)
         {
-            bool isTaskNameExist = _taskManagementRepository.IsTaskNameExist(updateTask.Name);
+            bool isTaskNameExist = _taskManagementRepository.IsUpdateTaskNameExist(updateTask.Name,id);
             if(isTaskNameExist)
             {
                 return new ErrorDTO() {type="Task",description="Task name already exist" };
@@ -309,16 +349,12 @@ namespace TaskManagement.Service
             task.DueDate = updateTask.DueDate;
             task.Priority = updateTask.Priority;
             task.Status = updateTask.Status;
-            foreach (Guid item in updateTask.Assignee)
+            task.TaskMapAssignee = updateTask.Assignee.Select(sel => new TaskMapAssignee
             {
-                TaskMapAssignee taskMapAssignee = new TaskMapAssignee()
-                {
-                    Id=Guid.NewGuid(),
-                    AssigneeId=item,
-                    TaskId=id,
-                };
-                task.TaskMapAssignee.Add(taskMapAssignee);
+                AssigneeId = sel,
+                TaskId = id
             }
+            ).ToList();
             _taskManagementRepository.UpdateTask(task);
             return null;
         }
@@ -347,7 +383,7 @@ namespace TaskManagement.Service
                 return new ErrorDTO() {type="Task",description="Task id not found" };
             }
             bool isStatusId = _taskManagementRepository.IsStatusIdFound(statusId);
-            if(isStatusId)
+            if(!isStatusId)
             {
                 return new ErrorDTO() {type="Meta-data",description="meta-data not found" };
             }
@@ -373,7 +409,7 @@ namespace TaskManagement.Service
                 return new ErrorDTO() { type = "Task", description = "Task id not found" };
             }
             bool isStatusId = _taskManagementRepository.IsStatusIdFound(remainderId);
-            if (isStatusId)
+            if (!isStatusId)
             {
                 return new ErrorDTO() { type = "StatusId", description = "meta-data not found" };
             }
@@ -399,6 +435,48 @@ namespace TaskManagement.Service
                 return null;
             }
             return assignees;
+        }
+
+        public ErrorDTO IsDateInvalid(string start,string end)
+        {
+            if (!DateTime.TryParse(start, out DateTime dateValu))
+            {
+                return new ErrorDTO() { type = "StartDate", description = $"Invalid date time {start}" };
+            }
+            else if (!DateTime.TryParse(end, out DateTime dateValue))
+            {
+                return new ErrorDTO() { type = "DueDate", description = $"Invalid date time {end}" };
+            }
+            return null;
+        }
+        public ErrorDTO CheckMetadata(CreateTaskDTO task)
+        {
+            List<RefTerm> termData = _taskManagementRepository.GetSetData();
+            List<Guid> ids = termData.Select(sel => sel.Id).ToList();
+            if (!ids.Contains(task.Priority))
+            {
+                return new ErrorDTO() { type = "Priority", description = $"Meta-data id {task.Priority} not found" };
+            }
+            else if (!ids.Contains(task.Status))
+            {
+                return new ErrorDTO() { type = "Status", description = $"Meta-data id {task.Priority} not found" };
+            }
+            else if (!ids.Contains(task.ReminderPeriodId) && task.ReminderPeriodId != Guid.Empty)
+            {
+                return new ErrorDTO() { type = "RemainderPeriod", description = $"Meta-data id {task.ReminderPeriodId} not found" };
+            }
+            Guid userId = _taskManagementRepository.IsUserExist(task.Assignee);
+            if (userId != Guid.Empty)
+            {
+                return new ErrorDTO() { type = "Assignee", description = $"Assignee with id {userId} not found" };
+            }
+            bool isAssignerExist = _taskManagementRepository.IsAssignerExist(task.Assigner);
+            if(!isAssignerExist)
+            {
+                return new ErrorDTO() {type="Assigner",description=$"Assigner with id {task.Assigner} not found" };
+            }
+
+            return null;
         }
     }
 }

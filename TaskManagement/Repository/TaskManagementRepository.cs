@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TaskManagement.Contracts;
+using TaskManagement.Entities.Dtos;
 using TaskManagement.Entities.Models;
 using TaskManagement.Models;
 
@@ -109,16 +110,16 @@ namespace TaskManagement.Repository
         public List<Tasks> GetTaskList(Guid id, int size, int pageNo)
         {
             List<Tasks> list = new List<Tasks>();
-            foreach (var item in _taskManagementContext.Tasks.Include(s => s.TaskMapAssignee).Skip((pageNo - 1) * 5).Take(size))
+            foreach (Tasks item in _taskManagementContext.Tasks.Include(s => s.TaskMapAssignee).Skip((pageNo - Constants.pageNO) * Constants.pagesize).Take(size))
             {
-                var c =  item.Assigner == id || item.TaskMapAssignee.Select(s => s.AssigneeId).ToList().Contains(id);
-                if (c)
+                bool isExist =  item.Assigner == id || item.TaskMapAssignee.Select(s => s.AssigneeId).ToList().Contains(id);
+                if (isExist)
                 {
                     list.Add(item);
                 }
             }
             return list;
-            //var l = _taskManagementContext.Assignee.Select(sel => sel.Id).ToList();
+            //bool l = _taskManagementContext.Assignee.Select(sel => sel.Id).ToList();
             //return _taskManagementContext.Tasks.Include(inc => inc.TaskMapAssignee)
             //    .Where(find => find.Assigner == id || l.Contains(find.)) /*|| IsExist(find.TaskMapAssignee, id))*/
             //    .Skip((pageNo - 1) * 5)
@@ -232,12 +233,12 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool DeleteTask(Guid id)
         {
-            Tasks task = _taskManagementContext.Tasks.Include(term => term.TaskMapAssignee).Where(find => find.Id == id).FirstOrDefault();
+            List<Tasks> task = _taskManagementContext.Tasks.Include(term => term.TaskMapAssignee).Where(find => find.Id == id || find.ParentTaskId == id).ToList();
             if(task == null)
             {
                 return false;
             }
-            _taskManagementContext.Tasks.Remove(task);
+            _taskManagementContext.Tasks.RemoveRange(task);
             _taskManagementContext.SaveChanges();
             return true;
         }
@@ -280,9 +281,41 @@ namespace TaskManagement.Repository
             return _taskManagementContext.Assignee.ToList();
         }
 
+        ///<summary>
+        /// checks assignee is exist or not
+        ///</summary>
+        ///<return>bool</return>
         public bool IsAssignerExist(Guid id)
         {
             return _taskManagementContext.Assignee.Any(find => find.Id == id);
+        }
+
+        ///<summary>
+        /// checks parent id exist or not
+        ///</summary>
+        ///<return>bool</return>
+        public bool CheckParentTaskId(Guid id)
+        {
+            return _taskManagementContext.Tasks.Any(find => find.Id == id);
+        }
+
+        ///<summary>
+        /// checks parent task date exist or not
+        ///</summary>
+        ///<return>Tasks</return>
+        public Tasks IsParentTaskDatesValid(string end, string start, Guid parentTaskId)
+        {
+            return  _taskManagementContext.Tasks.Where(find => find.Id == parentTaskId).FirstOrDefault();
+        }
+
+
+        ///<summary>
+        /// checks parent task exist or not
+        ///</summary>
+        ///<return>Tasks</return>
+        public Tasks GetParentTask(Guid id)
+        {
+            return _taskManagementContext.Tasks.Where(sel => sel.Id == id).FirstOrDefault();
         }
     }
 }

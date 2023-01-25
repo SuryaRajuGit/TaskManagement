@@ -7,10 +7,19 @@ namespace TaskManagement.Models
 {
     public class TaskMapAssignee
     {
+        ///<summary>
+        /// Id of the class 
+        ///</summary>
         public Guid Id { get; set; }
 
+        ///<summary>
+        /// foregin key of the task
+        ///</summary>
         public Guid TaskId { get; set; }
 
+        ///<summary>
+        /// Id of the Assignee 
+        ///</summary>
         public Guid AssigneeId { get; set; }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.Entities.Dtos
 {
-    public class Constants
+    public static class Constants
     {
         public const string secutityKey = "thisismySecureKey12345678";
 
@@ -36,5 +36,9 @@ namespace TaskManagement.Entities.Dtos
         public const string Priority = "priority";
 
         public const string Status = "status";
+
+        public const int pagesize = 5;
+
+        public const int pageNO = 1;
     }
 }

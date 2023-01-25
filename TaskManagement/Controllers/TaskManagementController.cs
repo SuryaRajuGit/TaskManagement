@@ -106,6 +106,11 @@ namespace TaskManagement.Controllers
             {
                 return NotFound(isMetdaDataValid);
             }
+            ErrorDTO isParentTaskDateVaid = _taskManagementService.CheckParentTaskDateDetails(task);
+            if (isParentTaskDateVaid != null)
+            {
+                return BadRequest(isParentTaskDateVaid);
+            }
             Guid? id = _taskManagementService.CreateTask(task); 
             if(id == null)
             {
@@ -113,7 +118,7 @@ namespace TaskManagement.Controllers
                 return StatusCode(409, new ErrorDTO() { type = "Task", description = "Task with the name already exist" });
             }
             _logger.LogInformation("Created Task successfully");
-            return Ok(id);
+            return StatusCode(201,id);
         }
 
         ///<summary>
@@ -122,8 +127,8 @@ namespace TaskManagement.Controllers
         ///<returns>List<GetTaskDTO></returns>
         [HttpGet]
         [Route("api/Task")]
-        public IActionResult GetTaskDetails([FromQuery(Name = Constants.userId)] Guid userId,[FromQuery] int size =Constants.pageSize, [FromQuery(Name = Constants.pageno)] int pageNo = Constants.pageNo, 
-            [FromQuery(Name = Constants.sortby)] string sortBy = Constants.firstName, [FromQuery(Name = Constants.sortorder)] string sortOrder = Constants.ASC )
+        public IActionResult GetTaskDetails([FromQuery(Name = Constants.userId)] Guid userId, [FromQuery(Name = Constants.sortby)] string sortBy, [FromQuery(Name = Constants.sortorder)] string sortOrder =Constants.ASC,
+             [FromQuery] int size = Constants.pageSize, [FromQuery(Name = Constants.pageno)] int pageNo = Constants.pageNo )
         {
             _logger.LogInformation("Getting list of task started");
             ErrorDTO isUserIdExist = _taskManagementService.IsUserIdExist(userId);
@@ -132,11 +137,11 @@ namespace TaskManagement.Controllers
                 _logger.LogError("User id not found");
                 return StatusCode(404, isUserIdExist);
             }
-            List<GetTaskDTO> task = _taskManagementService.GetTaskList(userId, size, pageNo, sortBy, sortOrder);
+            List<GetTaskDTO> task = _taskManagementService.GetTaskList(userId, size, pageNo, sortOrder, sortBy  );
             if(task == null)
             {
                 _logger.LogError("No Conent");
-                return StatusCode(201,"No Content");
+                return StatusCode(204,"No Content");
             }
             _logger.LogInformation("List of task details fetched successfully");
             return Ok(task);
@@ -164,12 +169,19 @@ namespace TaskManagement.Controllers
 
         ///<summary>
         /// Updates Task details
+        /// <param name="id"></param>
+        /// <param name="task"></param>
         ///</summary>
         [HttpPut]
         [Route("api/task/{id}")]
         public IActionResult UpdateTask([FromRoute] Guid id,[FromBody] UpdateTaskDTO task)
         {
             _logger.LogInformation("Updated Task started");
+            ErrorDTO isDateValid = _taskManagementService.IsDateInvalid(task.DueDate, task.StartDate);
+            if (isDateValid != null)
+            {
+                return BadRequest(isDateValid);
+            }
             if (!ModelState.IsValid)
             {
                 _logger.LogError("Entered wrong Task data");
@@ -181,6 +193,11 @@ namespace TaskManagement.Controllers
             {
                 _logger.LogError("Task id not found");
                 return StatusCode(404,isTaskExist);
+            }
+            ErrorDTO checkParentTask = _taskManagementService.CheckParentTaskDate(task,id);
+            if(checkParentTask != null)
+            {
+                return StatusCode(400,checkParentTask);
             }
             ErrorDTO response = _taskManagementService.UpdateTask(id,task);
             if(response != null)
@@ -194,6 +211,7 @@ namespace TaskManagement.Controllers
 
         ///<summary>
         /// Deletes Task 
+        ///<param name="id"></param>
         ///</summary>
         [HttpDelete]
         [Route("api/task/{id}")]
@@ -212,6 +230,7 @@ namespace TaskManagement.Controllers
 
         ///<summary>
         /// Updates Task Status
+        /// <param name="statusDTO"></param>
         ///</summary>
         [HttpPut] 
         [Route("api/task/{id}/status")]
@@ -224,19 +243,21 @@ namespace TaskManagement.Controllers
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
-            ErrorDTO response = _taskManagementService.IsUpdateTaskStatusExist(id, statusDTO.status);
+            ErrorDTO response = _taskManagementService.IsUpdateTaskStatusExist(id, statusDTO.Status);
             if(response != null)
             {
                 _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
-            _taskManagementService.UpdateStatus(id,statusDTO.status);
+            _taskManagementService.UpdateStatus(id,statusDTO.Status);
             _logger.LogInformation("Task status updated successfully");
             return Ok("Task status updated successfully");
         }
 
         ///<summary>
         /// Updates Task remainder
+        /// <param name="id"></param>
+        /// <param name="remainderDTO"></param>
         ///</summary>
         [HttpPut]
         [Route("api/task/{id}/remainder")]
@@ -249,13 +270,13 @@ namespace TaskManagement.Controllers
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
-            ErrorDTO response = _taskManagementService.IsUpdateRemainder(id, remainderDTO.remainder_period);
+            ErrorDTO response = _taskManagementService.IsUpdateRemainder(id, remainderDTO.RemainderPeriodId);
             if(response != null)
             {
                 _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
-            _taskManagementService.UpdateRemainder(id, remainderDTO.remainder_period);
+            _taskManagementService.UpdateRemainder(id, remainderDTO.RemainderPeriodId);
             _logger.LogInformation("Task remainder added successfully");
             return Ok("Task remainder added successfully");
         }

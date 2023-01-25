@@ -64,8 +64,8 @@ namespace TaskManagement
                 options.SuppressModelStateInvalidFilter = true;
             });
 
-            var serviceProvider = services.BuildServiceProvider();
-            var logger = serviceProvider.GetService<ILogger<TaskManagementController>>();
+            ServiceProvider serviceProvider = services.BuildServiceProvider();
+            ILogger<TaskManagementController> logger = serviceProvider.GetService<ILogger<TaskManagementController>>();
             services.AddSingleton(typeof(ILogger), logger);
             services.AddControllersWithViews()
             .AddNewtonsoftJson(options =>
@@ -76,9 +76,9 @@ namespace TaskManagement
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "AddressBook",
+                    Title = "TaskManagement",
                     Version = "v1",
-                    Description = "Open API AddressBook",
+                    Description = "Open API TaskManagement",
                 });
             });
         }
@@ -90,7 +90,8 @@ namespace TaskManagement
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseSwagger();
+            app.UseSwaggerUI();
             app.UseRouting();
 
             app.UseAuthorization();

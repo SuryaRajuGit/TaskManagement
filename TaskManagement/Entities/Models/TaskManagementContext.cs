@@ -36,7 +36,7 @@ namespace TaskManagement.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            string refTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\RefTermData.csv";
+            string refTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefTermData.csv";
             string refTermCSV = File.ReadAllText(refTermPath);
             string[] RefTermdata = refTermCSV.Split('\r');
             List<RefTerm> list = new List<RefTerm>();
@@ -49,7 +49,7 @@ namespace TaskManagement.Models
             modelBuilder.Entity<RefTerm>()
             .HasData(list);
 
-            string refSetTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\RefSetTerm.csv";
+            string refSetTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefSetTerm.csv";
             string refSetTermCSV = File.ReadAllText(refSetTermPath);
             string[] RefSetTermdata = refSetTermCSV.Split('\r');
             List<RefSetTerm> SetRefTermlist = new List<RefSetTerm>();
@@ -63,7 +63,7 @@ namespace TaskManagement.Models
             .HasData(SetRefTermlist);
 
 
-            string refSetPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\RefSetData.csv";
+            string refSetPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefSetData.csv";
             string refSetCSV = File.ReadAllText(refSetPath);
             string[] refSetdata = refSetCSV.Split('\r');
             List<RefSet> refSetList = new List<RefSet>();
@@ -77,7 +77,7 @@ namespace TaskManagement.Models
             .HasData(refSetList);
 
 
-            string loginPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\LoginData.csv";
+            string loginPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\LoginData.csv";
             string loginCSV = File.ReadAllText(loginPath);
             string[] LoginData = loginCSV.Split('\r');
             List<User> LoginList = new List<User>();
@@ -100,7 +100,7 @@ namespace TaskManagement.Models
             modelBuilder.Entity<User>()
             .HasData(LoginList);
 
-            string assigneeDataPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\AssigneeData.csv";
+            string assigneeDataPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\AssigneeData.csv";
             string assigneeCSV = File.ReadAllText(assigneeDataPath);
             string[] assigneedata = assigneeCSV.Split('\r');
             string[] dataRow = assigneeCSV.Split(",");

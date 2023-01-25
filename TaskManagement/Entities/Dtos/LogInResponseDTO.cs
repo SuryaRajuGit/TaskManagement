@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,8 +8,10 @@ namespace TaskManagement.Entities.Dtos
 {
     public class LogInResponseDTO
     {
-        public string access_token { get; set; }
+        [JsonProperty(PropertyName = "access_token")]
+        public string AccessToken { get; set; }
 
-        public string token_type { get; set; }
+        [JsonProperty(PropertyName = "token_type")]
+        public string TokenType { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TaskManagement.Entities.Models;
+using TaskManagement.Entities.Dtos;
 using TaskManagement.Models;
 
 namespace TaskManagement.Contracts
@@ -130,7 +130,7 @@ namespace TaskManagement.Contracts
         /// Gets list of Assginee 
         ///</summary>
         ///<return>List<Assignee></return>
-        public List<Assignee> GetAssigneeList();
+        public List<User> GetAllAssignee();
 
         ///<summary>
         /// checks assignee is exist or not
@@ -161,5 +161,41 @@ namespace TaskManagement.Contracts
         ///</summary>
         ///<return>Tasks</return>
         public Tasks GetParentTask(Guid id);
+
+        ///<summary>
+        /// checks new user sign up exits or not
+        ///</summary>
+        ///<return>bool</return>
+        public bool CheckUserName(string name);
+
+        ///<summary>
+        /// checks phone number exist or not
+        ///</summary>
+        ///<return>bool</return>
+        public bool CheckPhone(string phone);
+
+        ///<summary>
+        /// Saves user details
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid SaveUser(User user);
+
+        ///<summary>
+        /// Gets user id with user name
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid GetId(string userName);
+
+        ///<summary>
+        /// Gets status id 
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid GetStatusId();
+
+        ///<summary>
+        /// Gets priority id
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid GetPriorityId();
     }
 }

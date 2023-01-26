@@ -19,37 +19,6 @@ namespace TaskManagement.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("TaskManagement.Entities.Models.Assignee", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Assignee");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("da2d22ae-bc19-475d-8779-4982a7623742"),
-                            Name = "surya"
-                        },
-                        new
-                        {
-                            Id = new Guid("9a97f397-41e6-4db8-88c4-150a0b414df1"),
-                            Name = "raju"
-                        },
-                        new
-                        {
-                            Id = new Guid("2aaa6be5-5e9b-47fb-85c8-1855ca710275"),
-                            Name = "psr"
-                        });
-                });
-
             modelBuilder.Entity("TaskManagement.Models.RefSet", b =>
                 {
                     b.Property<Guid>("Id")
@@ -110,49 +79,49 @@ namespace TaskManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("00a626b6-d14e-46b2-aa6a-ebbb3eb0a7e6"),
+                            Id = new Guid("4e52c006-69ee-4831-8c9a-528ed15ef4ab"),
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("246b7c06-f7b8-49e6-873c-fcc337c2056a")
                         },
                         new
                         {
-                            Id = new Guid("cb366361-904e-4a0f-ab48-e42e7bef33e9"),
+                            Id = new Guid("f5937774-04f6-404f-8f73-9076cef0e234"),
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("65a9194f-6e36-4451-ac6b-f8c3e2f2a794")
                         },
                         new
                         {
-                            Id = new Guid("97b312ab-a878-45d7-a9ff-b7cee2ef0045"),
+                            Id = new Guid("fbea257b-4350-44c1-9c61-4eae0edf4bdc"),
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("d2c7f6ed-174f-4782-8207-ca847cb5e5ad")
                         },
                         new
                         {
-                            Id = new Guid("8194cf76-9fe7-4795-808b-3b6367a44380"),
+                            Id = new Guid("c5b3d1ac-6a61-4d76-b63f-aef2a9c045fa"),
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("031feee7-02c4-43f7-9269-b777ae5558d4")
                         },
                         new
                         {
-                            Id = new Guid("82352386-1b85-4ed7-80ca-9d27802a588d"),
+                            Id = new Guid("3fca2bac-e307-46bf-9f0c-fbea41afb038"),
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("5443d3e4-1cc2-49f9-af36-ec46c00c8844")
                         },
                         new
                         {
-                            Id = new Guid("a9313597-d962-48f2-8ceb-7c9e5e3ef6f5"),
+                            Id = new Guid("72183858-d59f-4a06-9e3c-06538b6f28ef"),
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("09cd2a9b-a3ef-4487-a37c-e076569cf752")
                         },
                         new
                         {
-                            Id = new Guid("c71465b2-a202-43db-ad2e-cfde5561bcef"),
+                            Id = new Guid("6ec637f5-c764-4678-960d-232d45787dea"),
                             RefSetId = new Guid("e28e09d8-76f8-43ba-be0b-d7eade3b1e6b"),
                             RefTermId = new Guid("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2")
                         },
                         new
                         {
-                            Id = new Guid("2864ff99-28e4-4a51-90a0-b9b0821b285f"),
+                            Id = new Guid("5c799f14-7220-494a-b94f-6769f89c11f6"),
                             RefSetId = new Guid("e28e09d8-76f8-43ba-be0b-d7eade3b1e6b"),
                             RefTermId = new Guid("cd2a89f8-dd1a-4a62-8802-1ec27c2c3980")
                         });
@@ -179,37 +148,37 @@ namespace TaskManagement.Migrations
                         {
                             Id = new Guid("246b7c06-f7b8-49e6-873c-fcc337c2056a"),
                             Description = "high",
-                            Key = "High"
+                            Key = "HIGH"
                         },
                         new
                         {
                             Id = new Guid("65a9194f-6e36-4451-ac6b-f8c3e2f2a794"),
                             Description = "medium",
-                            Key = "Medium"
+                            Key = "MEDIUM"
                         },
                         new
                         {
                             Id = new Guid("d2c7f6ed-174f-4782-8207-ca847cb5e5ad"),
                             Description = "low",
-                            Key = "Low"
+                            Key = "LOW"
                         },
                         new
                         {
                             Id = new Guid("031feee7-02c4-43f7-9269-b777ae5558d4"),
                             Description = "open",
-                            Key = "Open"
+                            Key = "OPEN"
                         },
                         new
                         {
                             Id = new Guid("5443d3e4-1cc2-49f9-af36-ec46c00c8844"),
                             Description = "inprogress",
-                            Key = "InProgress"
+                            Key = "INPROGRESS"
                         },
                         new
                         {
                             Id = new Guid("09cd2a9b-a3ef-4487-a37c-e076569cf752"),
                             Description = "completed",
-                            Key = "Completed"
+                            Key = "COMPLETED"
                         },
                         new
                         {
@@ -225,7 +194,7 @@ namespace TaskManagement.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TaskManagement.Models.TaskMapAssignee", b =>
+            modelBuilder.Entity("TaskManagement.Models.TaskAssigneeMapping", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -244,7 +213,7 @@ namespace TaskManagement.Migrations
 
                     b.HasIndex("TasksId");
 
-                    b.ToTable("TaskMapAssignee");
+                    b.ToTable("TaskAssigneeMapping");
                 });
 
             modelBuilder.Entity("TaskManagement.Models.Tasks", b =>
@@ -291,7 +260,13 @@ namespace TaskManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
@@ -304,7 +279,7 @@ namespace TaskManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("78293a57-d234-45b4-a13b-c50ad2fc676e"),
+                            Id = new Guid("b0809ba9-2cdb-400c-852b-d9fa50b671b6"),
                             Password = "o4UhjEI94IFLPSGjPrdplj3C1Z9g+z7tDY3/2ZedF1c=",
                             UserName = "surya"
                         });
@@ -325,7 +300,7 @@ namespace TaskManagement.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TaskManagement.Models.TaskMapAssignee", b =>
+            modelBuilder.Entity("TaskManagement.Models.TaskAssigneeMapping", b =>
                 {
                     b.HasOne("TaskManagement.Models.Tasks", null)
                         .WithMany("TaskMapAssignee")

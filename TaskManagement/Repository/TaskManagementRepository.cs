@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TaskManagement.Contracts;
 using TaskManagement.Entities.Dtos;
-using TaskManagement.Entities.Models;
 using TaskManagement.Models;
 
 namespace TaskManagement.Repository
@@ -84,16 +83,16 @@ namespace TaskManagement.Repository
         ///<return>List<RefTerm></return>
         public bool IsUserIdExist(Guid id)
         {
-            return _taskManagementContext.Assignee.Any(find => find.Id == id);
+            return _taskManagementContext.User.Any(find => find.Id == id);
         }
 
         ///<summary>
         /// Gets list of meta-data 
         ///</summary>
         ///<return>List<RefTerm></return>
-        public bool IsExist(List<TaskMapAssignee> taskMapAssignee, Guid id)
+        public bool IsExist(List<TaskAssigneeMapping> taskMapAssignee, Guid id)
         {
-            foreach (TaskMapAssignee item in taskMapAssignee)
+            foreach (TaskAssigneeMapping item in taskMapAssignee)
             {
                 if (item.AssigneeId == id)
                 {
@@ -119,12 +118,6 @@ namespace TaskManagement.Repository
                 }
             }
             return list;
-            //bool l = _taskManagementContext.Assignee.Select(sel => sel.Id).ToList();
-            //return _taskManagementContext.Tasks.Include(inc => inc.TaskMapAssignee)
-            //    .Where(find => find.Assigner == id || l.Contains(find.)) /*|| IsExist(find.TaskMapAssignee, id))*/
-            //    .Skip((pageNo - 1) * 5)
-            //    .Take(size)
-            //    .ToList();
         }
 
         ///<summary>
@@ -152,7 +145,7 @@ namespace TaskManagement.Repository
         public List<string> GetAssigneeName(List<Guid> assigneeList)
         {
             List<string> assignee = new List<string>();
-            foreach (Assignee item in _taskManagementContext.Assignee)
+            foreach (User item in _taskManagementContext.User)
             {
                 if(assigneeList.Contains(item.Id))
                 {
@@ -187,7 +180,7 @@ namespace TaskManagement.Repository
         ///<return>stirng</return>
         public string GetAssigner(Guid id)
         {
-            return _taskManagementContext.Assignee.Where(find => find.Id == id).Select(sel => sel.Name).First();
+            return _taskManagementContext.User.Where(find => find.Id == id).Select(sel => sel.Name).First();
         }
 
         ///<summary>
@@ -207,7 +200,7 @@ namespace TaskManagement.Repository
         {
             foreach (Guid item in ids)
             {
-                bool isExist = _taskManagementContext.Assignee.Any(sel => sel.Id == item);
+                bool isExist = _taskManagementContext.User.Any(sel => sel.Id == item);
                 if(!isExist)
                 {
                     return item;
@@ -221,9 +214,9 @@ namespace TaskManagement.Repository
         ///</summary>
         public void UpdateTask(Tasks tasks)
         {
-            List<TaskMapAssignee> list =  _taskManagementContext.TaskMapAssignee.Where(find => find.TaskId == tasks.Id).ToList();
+            List<TaskAssigneeMapping> list =  _taskManagementContext.TaskAssigneeMapping.Where(find => find.TaskId == tasks.Id).ToList();
             _taskManagementContext.Tasks.Update(tasks);
-            _taskManagementContext.TaskMapAssignee.RemoveRange(list);
+            _taskManagementContext.TaskAssigneeMapping.RemoveRange(list);
             _taskManagementContext.SaveChanges();
         }
 
@@ -234,7 +227,7 @@ namespace TaskManagement.Repository
         public bool DeleteTask(Guid id)
         {
             List<Tasks> task = _taskManagementContext.Tasks.Include(term => term.TaskMapAssignee).Where(find => find.Id == id || find.ParentTaskId == id).ToList();
-            if(task == null)
+            if(task.Count() == 0)
             {
                 return false;
             }
@@ -276,9 +269,9 @@ namespace TaskManagement.Repository
         /// Gets list of Assginee 
         ///</summary>
         ///<return>List<Assignee></return>
-        public List<Assignee> GetAssigneeList()
+        public List<User> GetAllAssignee()
         {
-            return _taskManagementContext.Assignee.ToList();
+            return _taskManagementContext.User.ToList();
         }
 
         ///<summary>
@@ -287,7 +280,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool IsAssignerExist(Guid id)
         {
-            return _taskManagementContext.Assignee.Any(find => find.Id == id);
+            return _taskManagementContext.User.Any(find => find.Id == id);
         }
 
         ///<summary>
@@ -315,7 +308,67 @@ namespace TaskManagement.Repository
         ///<return>Tasks</return>
         public Tasks GetParentTask(Guid id)
         {
-            return _taskManagementContext.Tasks.Where(sel => sel.Id == id).FirstOrDefault();
+            Guid taskId = _taskManagementContext.Tasks.Where(find => find.Id == id).Select(sel => sel.ParentTaskId).FirstOrDefault();
+            if(taskId == null)
+            {
+                return null;
+            }
+            return _taskManagementContext.Tasks.Where(sel => sel.Id == taskId).FirstOrDefault();
+        }
+
+        ///<summary>
+        /// checks new user sign up exits or not
+        ///</summary>
+        ///<return>bool</return>
+        public bool CheckUserName(string name)
+        {
+            return _taskManagementContext.User.Any(sel => sel.UserName == name);
+        }
+
+        ///<summary>
+        /// checks phone number exist or not
+        ///</summary>
+        ///<return>bool</return>
+        public bool CheckPhone(string phone)
+        {
+            return _taskManagementContext.User.Any(sel => sel.Phone == phone);
+        }
+
+        ///<summary>
+        /// Saves user details
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid SaveUser(User user)
+        {
+            _taskManagementContext.User.Add(user);
+            _taskManagementContext.SaveChanges();
+            return user.Id;
+        }
+        ///<summary>
+        /// Gets user id with user name
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid GetId(string userName)
+        {
+            return _taskManagementContext.User.Where(find => find.UserName == userName).Select(sel => sel.Id).FirstOrDefault();
+        }
+
+        ///<summary>
+        /// Gets status id 
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid GetStatusId()
+        {
+            return _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Open ).Select(fin => fin.Id).First();
+        }
+
+        ///<summary>
+        /// Gets priority id
+        ///</summary>
+        ///<return>Guid</return>
+        public Guid GetPriorityId()
+        {
+            return _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Low).Select(sel => sel.Id).First();
         }
     }
 }

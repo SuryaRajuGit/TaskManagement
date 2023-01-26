@@ -12,7 +12,7 @@ namespace TaskManagement.Helpers
     {
         public Mappers()
         {
-            CreateMap<Tasks, CreateTaskDTO>().ReverseMap().ForMember(sel => sel.TaskMapAssignee,fin => fin.MapFrom(act => new List<TaskMapAssignee>()));
+            CreateMap<Tasks, CreateTaskDTO>().ReverseMap().ForMember(sel => sel.TaskMapAssignee,fin => fin.MapFrom(act => new List<TaskAssigneeMapping>()));
             
             CreateMap<GetSingleTaskDTO,Tasks>().ReverseMap().ForMember(sel => sel.Priority,fin => fin.MapFrom(act => ""))
                 .ForMember(sel => sel.Status,fin => fin.MapFrom(act => ""))
@@ -24,9 +24,8 @@ namespace TaskManagement.Helpers
                 .ForMember(sel => sel.Status, fin => fin.MapFrom(act => ""))
                 .ForMember(sel => sel.Priority, fin => fin.MapFrom(act => ""));
 
-            //CreateMap<Tasks, UpdateTaskDTO>().ReverseMap().ForMember(sel => sel.TaskMapAssignee, fin => fin.MapFrom(act => new List<TaskMapAssignee>()))
-            //    .ForMember(sel => sel.StartDate, fin => fin.MapFrom(act => new DateTime()))
-            //    .ForMember(sel => sel.DueDate, fin => fin.MapFrom(act => new DateTime()));
+            CreateMap<User, AssigneeDTO>().ReverseMap();
+            CreateMap<User, SignUpDTO>().ReverseMap();
         }
     }
 }

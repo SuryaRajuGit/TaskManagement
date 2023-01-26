@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -51,7 +53,8 @@ namespace TaskManagement
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"])),
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                        RoleClaimType = "role-abc",
+                        RoleClaimType = "UserId",
+                        NameClaimType = "hhhh"
                     };
                 });
             services.AddAutoMapper(typeof(Startup));
@@ -63,7 +66,7 @@ namespace TaskManagement
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
-
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             ILogger<TaskManagementController> logger = serviceProvider.GetService<ILogger<TaskManagementController>>();
             services.AddSingleton(typeof(ILogger), logger);

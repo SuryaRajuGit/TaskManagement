@@ -11,13 +11,12 @@ using System.Threading.Tasks;
 using TaskManagement.Contracts;
 using TaskManagement.Dtos;
 using TaskManagement.Entities.Dtos;
-using TaskManagement.Entities.Models;
 
 namespace TaskManagement.Controllers
 {
    
     [ApiController]
-    //[Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = Constants.Bearer)]
     public class TaskManagementController : ControllerBase
     {
         private readonly ITaskManagementService _taskManagementService;
@@ -42,7 +41,7 @@ namespace TaskManagement.Controllers
             _logger.LogInformation("Verifying user started");
             if (!ModelState.IsValid)
             {
-                _logger.LogError("Entered wrong log in data");
+                _logger.LogError("Entered wrong login data");
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
@@ -50,7 +49,7 @@ namespace TaskManagement.Controllers
             if(isUserValid == null)
             {
                 _logger.LogError("Invalid login details");
-                return StatusCode(401,new ErrorDTO() {type="User",description="Invalid log in details" });
+                return StatusCode(401,new ErrorDTO() {type="UnAuthorised",description="Invalid login details" });
             }
             _logger.LogInformation("User verified successfully");
             return Ok(isUserValid);
@@ -70,7 +69,7 @@ namespace TaskManagement.Controllers
             if (response == null)
             {
                 _logger.LogError("key not found");
-                return NotFound(new ErrorDTO{type = "key",description = key + " key not exists in database"});
+                return NotFound(new ErrorDTO{type = "NotFound",description = key + " key not exists in database"});
             }
             if (response.Count == 0)
             {
@@ -87,7 +86,7 @@ namespace TaskManagement.Controllers
         ///<param name="task"></param>
         ///<returns>Guid</returns>
         [HttpPost]
-        [Route("api/Task")]
+        [Route("api/task")]
         public IActionResult CreateTask([FromBody] CreateTaskDTO task )
         {
             ErrorDTO response = _taskManagementService.IsDateInvalid(task.DueDate,task.StartDate);
@@ -115,7 +114,7 @@ namespace TaskManagement.Controllers
             if(id == null)
             {
                 _logger.LogError("Task name already exits");
-                return StatusCode(409, new ErrorDTO() { type = "Task", description = "Task with the name already exist" });
+                return StatusCode(409, new ErrorDTO() { type = "Conflict", description = "Task with the name already exist" });
             }
             _logger.LogInformation("Created Task successfully");
             return StatusCode(201,id);
@@ -178,7 +177,7 @@ namespace TaskManagement.Controllers
         {
             _logger.LogInformation("Updated Task started");
             ErrorDTO isDateValid = _taskManagementService.IsDateInvalid(task.DueDate, task.StartDate);
-            if (isDateValid != null)
+            if (isDateValid != null) 
             {
                 return BadRequest(isDateValid);
             }
@@ -218,6 +217,12 @@ namespace TaskManagement.Controllers
         public IActionResult DeleteTask([FromRoute] Guid id)
         {
             _logger.LogInformation("Delete Task started");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Entered wrong Task data");
+                ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
+                return BadRequest(badRequest);
+            }
             ErrorDTO response = _taskManagementService.DeleteTask(id);
             if(response != null)
             {
@@ -278,7 +283,7 @@ namespace TaskManagement.Controllers
             }
             _taskManagementService.UpdateRemainder(id, remainderDTO.RemainderPeriodId);
             _logger.LogInformation("Task remainder added successfully");
-            return Ok("Task remainder added successfully");
+            return Ok("Task remainder updated successfully");
         }
 
         ///<summary>
@@ -289,7 +294,7 @@ namespace TaskManagement.Controllers
         public IActionResult GetAssigneeList()
         {
             _logger.LogInformation("Getting list of assignee started");
-            List<Assignee> assignees = _taskManagementService.GetAssigneeList();
+            List<AssigneeDTO> assignees = _taskManagementService.GetAssigneeList();
             if (assignees == null)
             {
                 _logger.LogError("No Content");
@@ -297,6 +302,32 @@ namespace TaskManagement.Controllers
             }
             _logger.LogInformation("Fetched list of assignee successfully");
             return Ok(assignees);
+        }
+
+        ///<summary>
+        /// Creates new user 
+        ///</summary>
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("api/signup")]
+        public IActionResult SignUp(SignUpDTO user)
+        {
+            _logger.LogInformation("sign up user started");
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Entered wrong remainder data");
+                ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
+                return BadRequest(badRequest);
+            }
+            ErrorDTO response = _taskManagementService.SignUp(user);
+            if(response != null)
+            {
+                _logger.LogError("user name already exist");
+                return StatusCode(409,response);
+            }
+            _logger.LogInformation("New user created");
+            Guid id = _taskManagementService.SaveUser(user);
+            return StatusCode(201,id);
         }
 
     }

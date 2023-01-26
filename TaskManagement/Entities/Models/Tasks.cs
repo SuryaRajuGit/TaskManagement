@@ -60,7 +60,7 @@ namespace TaskManagement.Models
         ///<summary>
         /// List of assignee details
         ///</summary>
-        public List<TaskMapAssignee> TaskMapAssignee { get; set; }
+        public List<TaskAssigneeMapping> TaskMapAssignee { get; set; }
 
     }
 }

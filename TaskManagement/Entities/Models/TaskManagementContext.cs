@@ -7,7 +7,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManagement.Dtos;
-using TaskManagement.Entities.Models;
 
 namespace TaskManagement.Models
 {
@@ -30,9 +29,8 @@ namespace TaskManagement.Models
 
         public DbSet<RefTerm> RefTerm { get; set; }
 
-        public DbSet<TaskMapAssignee> TaskMapAssignee { get; set; }
+        public DbSet<TaskAssigneeMapping> TaskAssigneeMapping { get; set; }
 
-        public DbSet<Assignee> Assignee { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -99,19 +97,6 @@ namespace TaskManagement.Models
             }
             modelBuilder.Entity<User>()
             .HasData(LoginList);
-
-            string assigneeDataPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\AssigneeData.csv";
-            string assigneeCSV = File.ReadAllText(assigneeDataPath);
-            string[] assigneedata = assigneeCSV.Split('\r');
-            string[] dataRow = assigneeCSV.Split(",");
-            List<Assignee> assigneeList = new List<Assignee>();
-            foreach (string item in dataRow)
-            {
-                Assignee refObj = new Assignee { Id = Guid.NewGuid(), Name = item};
-                assigneeList.Add(refObj);
-            }
-            modelBuilder.Entity<Assignee>()
-            .HasData(assigneeList);
 
         }
     }

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TaskManagement.Dtos;
 using TaskManagement.Entities.Dtos;
-using TaskManagement.Entities.Models;
 using TaskManagement.Models;
 
 namespace TaskManagement.Contracts
@@ -115,7 +114,7 @@ namespace TaskManagement.Contracts
         ///<summary>
         /// Gets list of assignee
         ///</summary>
-        public List<Assignee> GetAssigneeList();
+        public List<AssigneeDTO> GetAssigneeList();
 
         ///<summary>
         /// Checks start date is lesser than due date
@@ -142,6 +141,18 @@ namespace TaskManagement.Contracts
         /// <param name = "id" ></ param >
         ///</summary>
         public ErrorDTO CheckParentTaskDate(UpdateTaskDTO task,Guid id);
+
+        ///<summary>
+        /// Checks user name aleady exist or not
+        /// <param name = "user" ></ param >
+        ///</summary>
+        public ErrorDTO SignUp(SignUpDTO user);
+
+        ///<summary>
+        /// Saves user details and returns id
+        /// <param name = "user" ></ param >
+        ///</summary>
+        public Guid SaveUser(SignUpDTO user);
 
     }
 }

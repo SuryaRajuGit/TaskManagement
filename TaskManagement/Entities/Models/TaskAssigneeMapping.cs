@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.Models
 {
-    public class TaskMapAssignee
+    public class TaskAssigneeMapping
     {
         ///<summary>
         /// Id of the class 

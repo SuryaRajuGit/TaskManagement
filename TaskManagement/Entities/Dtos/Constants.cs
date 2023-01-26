@@ -27,7 +27,7 @@ namespace TaskManagement.Entities.Dtos
 
         public const string userId = "user-id";
 
-        public const string Name = "Name";
+        public const string Name = "UserId";
 
         public const string DSC = "DSC";
 
@@ -40,5 +40,15 @@ namespace TaskManagement.Entities.Dtos
         public const int pagesize = 5;
 
         public const int pageNO = 1;
+
+        public const string Id = "Id";
+
+        public const string Issuer = "LOCAL AUTHORITY";
+
+        public const string Bearer = "Bearer";
+
+        public const string Open = "OPEN";
+
+        public const string Low = "LOW";
     }
 }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,12 +8,13 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using TaskManagement.Controllers;
 using TaskManagement.Dtos;
 using TaskManagement.Entities.Dtos;
-using TaskManagement.Entities.Models;
 using TaskManagement.Helpers;
 using TaskManagement.Models;
 using TaskManagement.Repository;
@@ -50,14 +52,30 @@ namespace UnitTest_TaskManagement
 
             IMapper mapper = mappingConfig.CreateMapper();
             _mapper = mapper;
+            Claim claim1 = new Claim("userId", "9dc4391c-6967-43c0-93dd-cfb0ac6efb46","","LOCAL AUTHORITY");
+            
+            ClaimsIdentity identity = new ClaimsIdentity(new[] {  claim1 }, "BasicAuthentication"); // this uses basic auth
+            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
+            GenericIdentity identityy = new GenericIdentity("some name", "test");
+            ClaimsPrincipal contextUser = new ClaimsPrincipal(identity);
+            DefaultHttpContext httpContext = new DefaultHttpContext()
+            {
+                User = contextUser
+            };
+
+            //Controller needs a controller context to access HttpContext
+            HttpContextAccessor _httpContextAccessor = new HttpContextAccessor()
+            {
+                HttpContext = httpContext
+            };
             DbContextOptions<TaskManagementContext> options = new DbContextOptionsBuilder<TaskManagementContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()).Options;
             _context = new TaskManagementContext(options);
             AddData();
             _context.Database.EnsureCreated();
             _repository = new TaskManagementRepository(_context);
-            _taskManagementServices = new TaskManagementService(_repository, _mapper);
+            _taskManagementServices = new TaskManagementService(_repository, _mapper, _httpContextAccessor);
             _taskManagementController = new TaskManagementController(_taskManagementServices, _logger);
         }
         public void AddData()
@@ -114,15 +132,17 @@ namespace UnitTest_TaskManagement
                 string EncryptPassword = Convert.ToBase64String(outputBuffer);
                 User user = new User()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse(row[2]),
                     UserName = row[0],
-                    Password = EncryptPassword
+                    Password = EncryptPassword,
+                    Name=row[0],
+                    Phone=row[3]
                 };
                 LoginList.Add(user);
             }
             _context.User.AddRange(LoginList);
-            Assignee assig = new Assignee { Id = Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"), Name = "test" };
-            _context.Assignee.Add(assig);
+            //Assignee assig = new Assignee { Id = Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"), Name = "test" };
+            //_context.Assignee.Add(assig);
 
             string taskDatePath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\TaskData.csv";
             string taskCSV = File.ReadAllText(taskDatePath);
@@ -132,8 +152,8 @@ namespace UnitTest_TaskManagement
             {
                 
                 string[] row = item.Split(",");
-                List<TaskMapAssignee> listAssignee = new List<TaskMapAssignee>();
-                TaskMapAssignee assignee = new TaskMapAssignee()
+                List<TaskAssigneeMapping> listAssignee = new List<TaskAssigneeMapping>();
+                TaskAssigneeMapping assignee = new TaskAssigneeMapping()
                 {
                     Id = Guid.Parse(row[9]),
                     AssigneeId = Guid.Parse(row[10]),
@@ -193,16 +213,16 @@ namespace UnitTest_TaskManagement
         public void Test_CreateTask()
         {
             List<Guid> guids = new List<Guid>();
-            guids.Add(Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"));
+            guids.Add(Guid.Parse("9dc4391c-6967-43c0-93dd-cfb0ac6efb46"));
             CreateTaskDTO createTaskDTO = new CreateTaskDTO()
             {
                 Name = "test",
                 Description = "test",
-                DueDate = "09/01/2023 03:00:00",
-                StartDate = "08/01/2023 03:00:00",
+                DueDate = "09/02/2023 03:00:00",
+                StartDate = "08/02/2023 03:00:00",
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
-                Assigner = Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"),
+             
                 Assignee = guids,
             };
             IActionResult response = _taskManagementController.CreateTask(createTaskDTO);
@@ -222,14 +242,14 @@ namespace UnitTest_TaskManagement
         [Fact]
         public void Test_GetTaskDetails()
         {
-            IActionResult response = _taskManagementController.GetTaskDetails(Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"), "Name", "ASC", 5, 1);
-            IActionResult response1 = _taskManagementController.GetTaskDetails(Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"), "Name", "DSC", 5, 1);
+            IActionResult response = _taskManagementController.GetTaskDetails(Guid.Parse("9dc4391c-6967-43c0-93dd-cfb0ac6efb46"), "Name", "ASC", 5, 1);
+            IActionResult response1 = _taskManagementController.GetTaskDetails(Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1"), "Name", "DSC", 5, 1);
             //IActionResult response1 = _taskManagementController.GetTaskDetails(Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"), "DueDate", "DSC", 5, 1);
 
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
-            OkObjectResult result1 = Assert.IsType<OkObjectResult>(response1);
+            ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
 
-            Assert.Equal(200, result1.StatusCode);
+            Assert.Equal(204, result1.StatusCode);
             Assert.Equal(200, result.StatusCode);
         }
         [Fact]
@@ -250,13 +270,13 @@ namespace UnitTest_TaskManagement
         public void Test_UpdateTask()
         {
             List<Guid> guids = new List<Guid>();
-            guids.Add(Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"));
+            guids.Add(Guid.Parse("9dc4391c-6967-43c0-93dd-cfb0ac6efb46"));
             UpdateTaskDTO updateTaskDTO = new UpdateTaskDTO()
             {
                 Name = "Suryaraju",
                 Description = "test up",
-                DueDate = "04/01/2009 15:32:00",
-                StartDate = "03/01/2009 06:32:00",
+                DueDate = "04/03/2023 15:32:00",
+                StartDate = "03/02/2023 06:32:00",
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
                 
@@ -266,8 +286,8 @@ namespace UnitTest_TaskManagement
             {
                 Name = "Suryaraju",
                 Description = "test up",
-                DueDate = "03/01/2009 15:32:00",
-                StartDate = "05/01/2009 06:32:00",
+                DueDate = "03/03/2023 15:32:00",
+                StartDate = "05/02/2009 06:32:00",
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
                 
@@ -322,6 +342,32 @@ namespace UnitTest_TaskManagement
             IActionResult response = _taskManagementController.GetAssigneeList();
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
             Assert.Equal(200, result.StatusCode);
+        }
+        [Fact]
+        public void Test_SignUp()
+        {
+            SignUpDTO signUpDTO = new SignUpDTO()
+            {
+                Name="Test Signup",
+                Password="Psr@964",
+                UserName="Test User",
+                Phone="8142255760"
+            };
+            SignUpDTO signUpDTO1 = new SignUpDTO()
+            {
+                Name = "Test Signup",
+                Password = "Psr@964",
+                UserName = "Test User",
+                Phone = "8142255769"
+            };
+            IActionResult response = _taskManagementController.SignUp(signUpDTO);
+            IActionResult response1 = _taskManagementController.SignUp(signUpDTO1);
+
+            ObjectResult result = Assert.IsType<ObjectResult>(response);
+            ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+
+            Assert.Equal(201, result.StatusCode);
+            Assert.Equal(409, result1.StatusCode);
         }
     }
 }

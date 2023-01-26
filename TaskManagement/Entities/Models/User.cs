@@ -21,5 +21,15 @@ namespace TaskManagement.Models
         /// password of the user
         ///</summary>
         public string Password { get; set; }
+
+        ///<summary>
+        /// password of the user
+        ///</summary>
+        public string Phone { get; set; }
+
+        ///<summary>
+        /// name of the user
+        ///</summary>
+        public string Name { get; set; }
     }
 }

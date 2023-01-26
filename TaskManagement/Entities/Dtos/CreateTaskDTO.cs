@@ -13,15 +13,15 @@ namespace TaskManagement.Entities.Dtos
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [Required]
+  
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
 
-        [Required]
+      
         [JsonProperty(PropertyName = "start_date")]
         public string StartDate { get; set; }
 
-        [Required]
+    
         [JsonProperty(PropertyName = "due_date")]
         public string DueDate { get; set; }
 
@@ -32,11 +32,11 @@ namespace TaskManagement.Entities.Dtos
         [JsonProperty(PropertyName = "assigner")]
         public Guid Assigner { get; set; }
 
-        [Required]
+      
         [JsonProperty(PropertyName = "assignee")]
         public List<Guid> Assignee { get; set; }
 
-        [Required]
+    
         [JsonProperty(PropertyName = "status")]
         public Guid Status { get; set; }
 

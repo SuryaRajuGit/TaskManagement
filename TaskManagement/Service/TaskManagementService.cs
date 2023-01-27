@@ -52,6 +52,7 @@ namespace TaskManagement.Service
         ///</summary>
         public LogInResponseDTO VerifyUser(LoginDTO loginDTO)
         {
+            //gets user passwod
             string encryptPassword = _taskManagementRepository.GetPassword(loginDTO.Email);
             if(encryptPassword == null)
             {
@@ -99,6 +100,7 @@ namespace TaskManagement.Service
         ///</summary>
         public List<MetaDataResponse> GetRefSetData(string key)
         {
+            //gets refset data
             List<RefTerm> refTerm = _taskManagementRepository.GetRefSetData(key);
             if (refTerm == null)
             {
@@ -142,6 +144,7 @@ namespace TaskManagement.Service
             {
                 task.StartDate =   DateTime.Now.ToString();
             }
+            //Checks task name exist or not and returns bool 
             bool isTaskNameExist = _taskManagementRepository.IsTaskNameExist(task.Name);
             if(isTaskNameExist == true)
             {
@@ -152,6 +155,7 @@ namespace TaskManagement.Service
             DateTime.TryParse(task.StartDate, out startDate);
             DateTime.TryParse(task.DueDate, out dueDate);
             Guid taskId = Guid.NewGuid(); 
+            // gets user id from claims
             Guid id = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);
             if(task.Status == Guid.Empty)
             {
@@ -196,6 +200,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO IsUserIdExist(Guid id)
         {
+            // Checks user id exist or not
             bool isUserIdExist = _taskManagementRepository.IsUserIdExist(id);
             if(!isUserIdExist)
             {
@@ -222,12 +227,14 @@ namespace TaskManagement.Service
             {
                 sortBy = Constants.Name;
             }
+            // Gets list of paginated tasks
             List<Tasks> paginatedList = _taskManagementRepository.GetTaskList( id,  size,  pageNo);
             List<Tasks> sortList = new List<Tasks>();
             if (paginatedList.Count() == 0)
             {
                 return null;
             }
+            //sorts paginated list of tasks
             switch (sortBy)
             {
                 case Constants.Name:
@@ -264,6 +271,7 @@ namespace TaskManagement.Service
                     sortList = paginatedList;
                     break;
             }
+            // Gets refterm data
             List<RefTerm> termData = _taskManagementRepository.GetSetData();
             List<GetTaskDTO> taskList = new List<GetTaskDTO>();
             foreach (Tasks item in sortList)
@@ -271,6 +279,7 @@ namespace TaskManagement.Service
                 GetTaskDTO getTaskDTO = _mapper.Map<GetTaskDTO>(item);
                 getTaskDTO.Priority = termData.Where(find => find.Id == item.Priority).Select(sel => sel.Key).First();
                 getTaskDTO.Status = termData.Where(find => find.Id == item.Status).Select(sel => sel.Key).First();
+                //Gets list of assignee names  with assignee ids
                 getTaskDTO.Assignee = _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(each => each.AssigneeId).ToList());
                 taskList.Add(getTaskDTO);
             }
@@ -283,17 +292,22 @@ namespace TaskManagement.Service
         ///</summary>
         public GetSingleTaskDTO GetSingleTask(Guid id)
         {
+            // Gets Task with id
             Tasks task = _taskManagementRepository.GetTask(id);
             if(task == null)
             {
                 return null;
             }
+            // Gets Sub tasks of parent task
             List<Tasks> subTasks = _taskManagementRepository.GetSubTasks(id);
+            // Gets refterm data
             List<RefTerm> termData = _taskManagementRepository.GetSetData();
             GetSingleTaskDTO getSingleTaskDTO = _mapper.Map<GetSingleTaskDTO>(task);
             getSingleTaskDTO.Status = termData.Where(find => find.Id == task.Status).Select(sel => sel.Key).First();
             getSingleTaskDTO.Priority = termData.Where(find => find.Id == task.Priority).Select(sel => sel.Key).First();
+            // Gets assignee names with list of assignee ids
             getSingleTaskDTO.Assignee = _taskManagementRepository.GetAssigneeName(task.TaskMapAssignee.Select(each => each.AssigneeId).ToList());
+            // Gets assigner name
             getSingleTaskDTO.Assigner = _taskManagementRepository.GetAssigner(task.Assigner);
             List<SubTaskDTO> subTaskList = new List<SubTaskDTO>();
             foreach (Tasks item in subTasks)
@@ -302,6 +316,7 @@ namespace TaskManagement.Service
                 {
                     Id = item.Id,
                     Name = item.Name,
+                    //Gets assignee names with list of assignee ids
                     Assignee = _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(each => each.AssigneeId).ToList())
                 };
                 subTaskList.Add(subTask);
@@ -317,11 +332,13 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO IsTaskExist(Guid id,UpdateTaskDTO updateTask)
         {
+            //Checks task id exist or not
             bool isTaskExist = _taskManagementRepository.IsTaskIdExist(id);
             if(!isTaskExist)
             {
                 return new ErrorDTO() {type="NotFound",description="Task id not found" };
             }
+            //Gets refterm data
             List<RefTerm> termData = _taskManagementRepository.GetSetData();
             List<Guid> ids = termData.Select(sel => sel.Id).ToList();
             if (!ids.Contains(updateTask.Priority) && updateTask.Priority != Guid.Empty)
@@ -351,6 +368,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO UpdateTask(Guid id,UpdateTaskDTO updateTask)
         {
+            //Checks update task name exist or not  and return bool
             bool isTaskNameExist = _taskManagementRepository.IsUpdateTaskNameExist(updateTask.Name,id);
             if(isTaskNameExist)
             {
@@ -360,7 +378,7 @@ namespace TaskManagement.Service
             {
                 updateTask.StartDate = DateTime.Now.ToString();
             }
-            
+            //Gets task details with task id
             Tasks task = _taskManagementRepository.GetTask(id);
             task.TaskMapAssignee = new List<TaskAssigneeMapping>();
             List<Guid> assigneeIds = task.TaskMapAssignee.Select(sel => sel.AssigneeId).ToList();
@@ -383,6 +401,7 @@ namespace TaskManagement.Service
                 task.Status = _taskManagementRepository.GetStatusId();
             }
             task.DueDate = DateTime.Parse(updateTask.DueDate);
+            //Gets user id from claims
             Guid userId = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);
             if (updateTask.Assignee != null)
             {
@@ -405,6 +424,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO DeleteTask(Guid id)
         {
+            //Checks task exist or not and retuns bool
             bool isTaskIdExist = _taskManagementRepository.DeleteTask(id);
             if(!isTaskIdExist)
             {
@@ -420,11 +440,13 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO IsUpdateTaskStatusExist(Guid id, Guid statusId)
         {
+            //Checks task id exist or not and retruns bool
             bool isTaskIdExist = _taskManagementRepository.IsTaskIdExist(id);
             if(!isTaskIdExist)
             {
                 return new ErrorDTO() {type="NotFound",description="Task id not found" };
             }
+            //checks status id exist or not and returns bool
             bool isStatusId = _taskManagementRepository.IsStatusIdFound(statusId);
             if(!isStatusId)
             {
@@ -450,11 +472,13 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO IsUpdateReminder(Guid id, Guid reminderId)
         {
+            //Checks update id exist or not and returns bool
             bool isTaskIdExist = _taskManagementRepository.IsTaskIdExist(id);
             if (!isTaskIdExist)
             {
                 return new ErrorDTO() { type = "NotFound", description = "Task id not found" };
             }
+            // Checks status id exist or not and returns bool
             bool isStatusId = _taskManagementRepository.IsStatusIdFound(reminderId);
             if (!isStatusId)
             {
@@ -478,6 +502,7 @@ namespace TaskManagement.Service
         ///</summary>
         public List<AssigneeDTO> GetAssigneeList()
         {
+            //Gets list of assignee 
             List<User> assignees = _taskManagementRepository.GetAllAssignee();
             if (assignees.Count() == 0)
             {
@@ -532,6 +557,7 @@ namespace TaskManagement.Service
             {
                 return new ErrorDTO() {type="BadRequest",description="DueDate must be greater than StartDate" };
             }
+            //Gets remainder days with remainder id
             string reminderDays = _taskManagementRepository.GetReminderDays(reminderId);
             char daysChar = reminderDays[0];
             int reaminderDays = int.Parse(daysChar.ToString());
@@ -565,6 +591,7 @@ namespace TaskManagement.Service
             }
             DateTime startDate = DateTime.Parse(createTask.StartDate);
             DateTime dueDate = DateTime.Parse(createTask.DueDate);
+            //Gets parent task with id
             Tasks parentTask = _taskManagementRepository.IsParentTaskDatesValid(createTask.DueDate, createTask.StartDate, createTask.ParentTaskId);
             if(parentTask.DueDate == DateTime.MinValue && parentTask.StartDate == DateTime.MinValue)
             {
@@ -587,6 +614,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO CheckMetadata(CreateTaskDTO task)
         {
+            //Gets list of refterm data
             List<RefTerm> termData = _taskManagementRepository.GetSetData();
             List<Guid> ids = termData.Select(sel => sel.Id).ToList();
             if (!ids.Contains(task.Priority) && task.Priority != Guid.Empty)
@@ -604,6 +632,7 @@ namespace TaskManagement.Service
             
             if (task.Assignee != null)
             {
+                //Checks user name exist or not and returns Guid
                 Guid userId = _taskManagementRepository.IsUserExist(task.Assignee);
                 if(userId != Guid.Empty)
                 {
@@ -612,6 +641,7 @@ namespace TaskManagement.Service
             }
             if(task.ParentTaskId != Guid.Empty )
             {
+                // Checks parent task id exist or not and returns bool
                 bool isParentTaskExist = _taskManagementRepository.CheckParentTaskId(task.ParentTaskId);
                 if(!isParentTaskExist)
                 {
@@ -628,6 +658,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO CheckParentTaskDate(UpdateTaskDTO task,Guid id)
         {
+            //Gets Parent Task with id
             Tasks parentTask = _taskManagementRepository.GetParentTask(id);
             if(parentTask == null || (parentTask.StartDate == DateTime.MinValue && parentTask.DueDate == DateTime.MinValue))
             {
@@ -682,6 +713,7 @@ namespace TaskManagement.Service
             userData.Phone = user.Phone;
             userData.IsActive = true;
             userData.CreatedDate = DateTime.Now;
+            // Saves user details and return id
             Guid id = _taskManagementRepository.SaveUser(userData);
             return id;
         }
@@ -691,15 +723,19 @@ namespace TaskManagement.Service
         ///</summary>
         public List<ReminderResponseDTO> GetReminder()
         {
+            //Gets user id from claims
             Guid id = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);
+            //Gets list of Tasks with user id
             List<Tasks> tasks = _taskManagementRepository.GetTaskList(id);
             DateTime dateTime = DateTime.Now;
             string day = dateTime.ToString(Constants.Date);
             DateTime currentDay = DateTime.Parse(day);
+            //Gets refterm data 
             List<RefTerm> reminderDays = _taskManagementRepository.GetRefTermDays();
             List<ReminderResponseDTO> list = new List<ReminderResponseDTO>();
             foreach (Tasks item in tasks)
             {
+                //Gets remainder days with remainder id
                 string daysString = reminderDays.Where(fin => fin.Id == item.ReminderPeriodId).Select(sel => sel.Key).First();
                 char daysChar = daysString[0];
                 int days = int.Parse(daysChar.ToString());

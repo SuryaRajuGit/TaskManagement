@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.Entities.Dtos
 {
-    public class RemainderDTO
+    public class ReminderDTO
     {
         [Required]
-        [JsonProperty(PropertyName = "remainder_period")]
-        public Guid RemainderPeriodId { get; set; }
+        [JsonProperty(PropertyName = "reminder_period")]
+        public Guid ReminderPeriodId { get; set; }
     }
 }

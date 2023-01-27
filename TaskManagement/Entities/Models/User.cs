@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManagement.Entities.Models;
 
 namespace TaskManagement.Models
 {
-    public class User
+    public class User : BaseModel
     {
         ///<summary>
-        /// Id of the user
+        /// User Email
         ///</summary>
-        public Guid Id { get; set; }
-
-        ///<summary>
-        /// User name
-        ///</summary>
-        public string UserName { get; set; }
+        public string Email { get; set; }
 
         ///<summary>
         /// password of the user

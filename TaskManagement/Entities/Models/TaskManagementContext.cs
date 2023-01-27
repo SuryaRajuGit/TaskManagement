@@ -25,7 +25,7 @@ namespace TaskManagement.Models
 
         public DbSet<RefSet> RefSet { get; set; }
 
-        public DbSet<RefSetTerm> RefSetTerm { get; set; }
+        public DbSet<SetRefTerm> SetRefTerm { get; set; }
 
         public DbSet<RefTerm> RefTerm { get; set; }
 
@@ -41,7 +41,7 @@ namespace TaskManagement.Models
             foreach (string item in RefTermdata)
             {
                 string[] row = item.Split(",");
-                RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
+                RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString(),CreatedDate=DateTime.Now,IsActive=true };
                 list.Add(refObj);
             }
             modelBuilder.Entity<RefTerm>()
@@ -50,14 +50,14 @@ namespace TaskManagement.Models
             string refSetTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefSetTerm.csv";
             string refSetTermCSV = File.ReadAllText(refSetTermPath);
             string[] RefSetTermdata = refSetTermCSV.Split('\r');
-            List<RefSetTerm> SetRefTermlist = new List<RefSetTerm>();
+            List<SetRefTerm> SetRefTermlist = new List<SetRefTerm>();
             foreach (string item in RefSetTermdata)
             {
                 string[] row = item.Split(",");
-                RefSetTerm refObj = new RefSetTerm() {Id=Guid.NewGuid(),RefSetId=Guid.Parse(row[0]),RefTermId=Guid.Parse(row[1]) };
+                SetRefTerm refObj = new SetRefTerm() {Id=Guid.NewGuid(),RefSetId=Guid.Parse(row[0]),RefTermId=Guid.Parse(row[1]),IsActive=true,CreatedDate=DateTime.Now };
                 SetRefTermlist.Add(refObj);
             }
-            modelBuilder.Entity<RefSetTerm>()
+            modelBuilder.Entity<SetRefTerm>()
             .HasData(SetRefTermlist);
 
 
@@ -68,7 +68,7 @@ namespace TaskManagement.Models
             foreach (string item in refSetdata)
             {
                 string[] row = item.Split(",");
-                RefSet refObj = new RefSet { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
+                RefSet refObj = new RefSet { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString(),IsActive = true, CreatedDate = DateTime.Now };
                 refSetList.Add(refObj);
             }
             modelBuilder.Entity<RefSet>()
@@ -90,8 +90,10 @@ namespace TaskManagement.Models
                 User user = new User()
                 {
                     Id = Guid.NewGuid(),
-                    UserName=row[0],
-                    Password= EncryptPassword
+                    Email=row[0],
+                    Password= EncryptPassword,
+                    IsActive = true,
+                    CreatedDate = DateTime.Now
                 };
                 LoginList.Add(user);
             }

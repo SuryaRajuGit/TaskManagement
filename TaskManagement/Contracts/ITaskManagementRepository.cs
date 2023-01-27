@@ -55,7 +55,7 @@ namespace TaskManagement.Contracts
         /// Gets list of meta-data  
         ///</summary>
         ///<return>List<RefSetTerm></return>
-        public List<RefSetTerm> GetTermData();
+        public List<SetRefTerm> GetTermData();
 
         ///<summary>
         /// Gets list of ref set data 
@@ -124,7 +124,7 @@ namespace TaskManagement.Contracts
         ///<summary>
         /// Updates Task remainder
         ///</summary>
-        public void UpdateRemainder(Guid id, Guid remainderId);
+        public void UpdateReminder(Guid id, Guid reminderId);
 
         ///<summary>
         /// Gets list of Assginee 
@@ -197,5 +197,23 @@ namespace TaskManagement.Contracts
         ///</summary>
         ///<return>Guid</return>
         public Guid GetPriorityId();
+
+        ///<summary>
+        /// Gets List of tasks
+        ///</summary>
+        ///<return>List<Tasks></return>
+        public List<Tasks> GetTaskList(Guid id);
+
+        ///<summary>
+        /// Gets reminder refterm data 
+        ///</summary>
+        ///<return>List<Tasks></return>
+        public List<RefTerm> GetRefTermDays();
+
+        ///<summary>
+        /// Gets reminder days
+        ///</summary>
+        ///<return>List<Tasks></return>
+        public string GetReminderDays(Guid id);
     }
 }

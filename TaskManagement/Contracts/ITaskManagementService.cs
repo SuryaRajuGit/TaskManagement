@@ -100,16 +100,16 @@ namespace TaskManagement.Contracts
         ///<summary>
         /// Checks meta-data id exist or not
         /// <param name = "id" ></ param >
-        /// <param name = "remainderId" ></ param >
+        /// <param name = "reminderId" ></ param >
         ///</summary>
-        public ErrorDTO IsUpdateRemainder(Guid id,Guid remainderId);
+        public ErrorDTO IsUpdateReminder(Guid id,Guid reminderId);
 
         ///<summary>
         /// Checks meta-data id exist or not
         /// <param name = "id" ></ param >
-        /// <param name = "remainderId" ></ param >
+        /// <param name = "reminderId" ></ param >
         ///</summary>
-        public void UpdateRemainder(Guid id,Guid remainderId);
+        public void UpdateReminder(Guid id,Guid reminderId);
 
         ///<summary>
         /// Gets list of assignee
@@ -121,7 +121,7 @@ namespace TaskManagement.Contracts
         /// <param name = "end" ></ param >
         /// <param name = "start" ></ param >
         ///</summary>
-        public ErrorDTO IsDateInvalid(string datetime,string time);
+        public ErrorDTO IsDateInvalid(string datetime,string time,Guid reminderId);
 
         ///<summary>
         /// Checks start date is lesser than due date
@@ -153,6 +153,11 @@ namespace TaskManagement.Contracts
         /// <param name = "user" ></ param >
         ///</summary>
         public Guid SaveUser(SignUpDTO user);
+
+        ///<summary>
+        /// Gets reminder detailsof user
+        ///</summary>
+        public List<ReminderResponseDTO> GetReminder();
 
     }
 }

@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManagement.Entities.Models;
 
 namespace TaskManagement.Models
 {
-    public class RefSet
+    public class RefSet : BaseModel
     {
-        ///<summary>
-        /// Id of the refset
-        ///</summary>
-        public Guid Id { get; set; }
 
         ///<summary>
         /// Key of the refset

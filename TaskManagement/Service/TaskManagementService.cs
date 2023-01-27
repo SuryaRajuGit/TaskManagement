@@ -52,7 +52,7 @@ namespace TaskManagement.Service
         ///</summary>
         public LogInResponseDTO VerifyUser(LoginDTO loginDTO)
         {
-            string encryptPassword = _taskManagementRepository.GetPassword(loginDTO.UserName);
+            string encryptPassword = _taskManagementRepository.GetPassword(loginDTO.Email);
             if(encryptPassword == null)
             {
                 return null;
@@ -62,7 +62,7 @@ namespace TaskManagement.Service
             byte[] inputbuffer = Convert.FromBase64String(encryptPassword);
             byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
             string password = Encoding.Unicode.GetString(outputBuffer);
-            Guid id = _taskManagementRepository.GetId(loginDTO.UserName);
+            Guid id = _taskManagementRepository.GetId(loginDTO.Email);
             if (password == loginDTO.Password)
             {
 
@@ -176,12 +176,17 @@ namespace TaskManagement.Service
                     {
                         Id = Guid.NewGuid(),
                         AssigneeId = item,
-                        TaskId = taskId
+                        TaskId = taskId,
+                        CreatedDate=DateTime.Now,
+                        CreatedId=id,
+                        IsActive=true
                     };
                     tasksList.Add(taskAssignee);
                 }
                 tasks1.TaskMapAssignee.AddRange(tasksList);
             }
+            tasks1.IsActive = true;
+            tasks1.CreatedDate = DateTime.Now;
             return _taskManagementRepository.SaveTask(tasks1);
         }
 
@@ -302,7 +307,6 @@ namespace TaskManagement.Service
                 subTaskList.Add(subTask);
             }
             getSingleTaskDTO.SubTasks.AddRange(subTaskList);
-           // getSingleTaskDTO.SubTasks.AddRange(subTaskList);
             return getSingleTaskDTO;
         }
 
@@ -379,13 +383,15 @@ namespace TaskManagement.Service
                 task.Status = _taskManagementRepository.GetStatusId();
             }
             task.DueDate = DateTime.Parse(updateTask.DueDate);
-           
+            Guid userId = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);
             if (updateTask.Assignee != null)
             {
                 task.TaskMapAssignee = updateTask.Assignee.Select(sel => new TaskAssigneeMapping
                 {
                     AssigneeId = sel,
-                    TaskId = id
+                    TaskId = id,
+                    UpdatedDate= DateTime.Now,
+                    UpdatedId= userId
                 }).ToList();
             }
             
@@ -440,16 +446,16 @@ namespace TaskManagement.Service
         ///<summary>
         /// Checks meta-data id exist or not
         /// <param name = "id" ></ param >
-        /// <param name = "remainderId" ></ param >
+        /// <param name = "reminderId" ></ param >
         ///</summary>
-        public ErrorDTO IsUpdateRemainder(Guid id, Guid remainderId)
+        public ErrorDTO IsUpdateReminder(Guid id, Guid reminderId)
         {
             bool isTaskIdExist = _taskManagementRepository.IsTaskIdExist(id);
             if (!isTaskIdExist)
             {
                 return new ErrorDTO() { type = "NotFound", description = "Task id not found" };
             }
-            bool isStatusId = _taskManagementRepository.IsStatusIdFound(remainderId);
+            bool isStatusId = _taskManagementRepository.IsStatusIdFound(reminderId);
             if (!isStatusId)
             {
                 return new ErrorDTO() { type = "NotFound", description = "meta-data not found" };
@@ -458,13 +464,13 @@ namespace TaskManagement.Service
         }
 
         ///<summary>
-        /// Updates Task remainder
+        /// Updates Task reminder
         /// <param name = "id" ></ param >
-        /// <param name = "remainderId" ></ param >
+        /// <param name = "reminderId" ></ param >
         ///</summary>
-        public void UpdateRemainder(Guid id, Guid remainderId)
+        public void UpdateReminder(Guid id, Guid reminderId)
         {
-            _taskManagementRepository.UpdateRemainder(id,remainderId);
+            _taskManagementRepository.UpdateReminder(id,reminderId);
         }
 
         ///<summary>
@@ -491,7 +497,7 @@ namespace TaskManagement.Service
         /// <param name = "end" ></ param >
         /// <param name = "start" ></ param >
         ///</summary>
-        public ErrorDTO IsDateInvalid(string end,string start)
+        public ErrorDTO IsDateInvalid(string end,string start,Guid reminderId)
         {
             DateTime dateTime = DateTime.Now;
             if (end == null && start == null)
@@ -516,7 +522,9 @@ namespace TaskManagement.Service
             {
                 return new ErrorDTO() { type = "BadRequest", description = $"Invalid due datetime {end}" };
             }
-            if (dateTime > startDate)
+            string day = dateTime.ToString(Constants.Date);
+            DateTime currentDay = DateTime.Parse(day);
+            if (currentDay > startDate && currentDay != startDate)
             {
                 return new ErrorDTO() { type="BadRequest",description="Invalid  start datetime"};
             }
@@ -524,7 +532,16 @@ namespace TaskManagement.Service
             {
                 return new ErrorDTO() {type="BadRequest",description="DueDate must be greater than StartDate" };
             }
+            string reminderDays = _taskManagementRepository.GetReminderDays(reminderId);
+            char daysChar = reminderDays[0];
+            int reaminderDays = int.Parse(daysChar.ToString());
+            int endDays = DateTime.Parse(end).Day;
+            int startDays = DateTime.Parse(start).Day;
 
+            if ((endDays - startDays) < reaminderDays && reminderId != Guid.Empty)
+            {
+                return new ErrorDTO() { type = "BadRequest", description = "Invalid Remainder days" };
+            }
             return null;
         }
 
@@ -592,7 +609,6 @@ namespace TaskManagement.Service
                 {
                     return new ErrorDTO() { type = "NotFound", description = $"Assignee with id {userId} not found" };
                 }
-                
             }
             if(task.ParentTaskId != Guid.Empty )
             {
@@ -635,7 +651,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO SignUp(SignUpDTO user)
         {
-            bool checkUserName = _taskManagementRepository.CheckUserName(user.UserName);
+            bool checkUserName = _taskManagementRepository.CheckUserName(user.Email);
             if (checkUserName)
             {
                 return new ErrorDTO() { type = "Conflict", description = "User name already exist" };
@@ -664,8 +680,52 @@ namespace TaskManagement.Service
             userData.Id = userId;
             userData.Name = user.Name; 
             userData.Phone = user.Phone;
+            userData.IsActive = true;
+            userData.CreatedDate = DateTime.Now;
             Guid id = _taskManagementRepository.SaveUser(userData);
             return id;
+        }
+
+        public List<ReminderResponseDTO> GetReminder()
+        {
+            Guid id = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);
+            List<Tasks> tasks = _taskManagementRepository.GetTaskList(id);
+            DateTime dateTime = DateTime.Now;
+            string day = dateTime.ToString(Constants.Date);
+            DateTime currentDay = DateTime.Parse(day);
+            List<RefTerm> reminderDays = _taskManagementRepository.GetRefTermDays();
+            List<ReminderResponseDTO> list = new List<ReminderResponseDTO>();
+            foreach (Tasks item in tasks)
+            {
+                string daysString = reminderDays.Where(fin => fin.Id == item.ReminderPeriodId).Select(sel => sel.Key).First();
+                char daysChar = daysString[0];
+                int days = int.Parse(daysChar.ToString());
+                string dueDateString = item.DueDate.ToString(Constants.Date);
+                DateTime dueDate = DateTime.Parse(dueDateString);
+
+                string currentString = item.StartDate.ToString(Constants.Date);
+                DateTime currentDate = DateTime.Parse(currentString);
+
+                string starttString = item.StartDate.ToString(Constants.Date);
+                DateTime startDate = DateTime.Parse(starttString);
+
+                DateTime remainderDay = dueDate.AddDays(days);
+                if(remainderDay >= currentDate)
+                {
+                    ReminderResponseDTO reminder = new ReminderResponseDTO()
+                    {
+                        Name = item.Name,
+                        TaskId = item.Id,
+                        ReminderMessage = $"Task due date {item.DueDate} "
+                    };
+                    list.Add(reminder);
+                }          
+            }
+            if(list.Count() != 0)
+            {
+                return list;
+            }
+            return null;
         }
     }
 }

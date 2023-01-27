@@ -89,7 +89,7 @@ namespace TaskManagement.Controllers
         [Route("api/task")]
         public IActionResult CreateTask([FromBody] CreateTaskDTO task )
         {
-            ErrorDTO response = _taskManagementService.IsDateInvalid(task.DueDate,task.StartDate);
+            ErrorDTO response = _taskManagementService.IsDateInvalid(task.DueDate,task.StartDate,task.ReminderPeriodId);
             if (response != null)
             {
                 return BadRequest(response);
@@ -176,7 +176,7 @@ namespace TaskManagement.Controllers
         public IActionResult UpdateTask([FromRoute] Guid id,[FromBody] UpdateTaskDTO task)
         {
             _logger.LogInformation("Updated Task started");
-            ErrorDTO isDateValid = _taskManagementService.IsDateInvalid(task.DueDate, task.StartDate);
+            ErrorDTO isDateValid = _taskManagementService.IsDateInvalid(task.DueDate, task.StartDate,Guid.Empty);
             if (isDateValid != null) 
             {
                 return BadRequest(isDateValid);
@@ -260,30 +260,30 @@ namespace TaskManagement.Controllers
         }
 
         ///<summary>
-        /// Updates Task remainder
+        /// Updates Task reminder
         /// <param name="id"></param>
-        /// <param name="remainderDTO"></param>
+        /// <param name="reminderDTO"></param>
         ///</summary>
         [HttpPut]
-        [Route("api/task/{id}/remainder")]
-        public IActionResult UpdateRemainder([FromRoute]Guid id,[FromBody] RemainderDTO remainderDTO )
+        [Route("api/task/{id}/reminder")]
+        public IActionResult UpdateReminder([FromRoute]Guid id,[FromBody] ReminderDTO reminderDTO )
         {
-            _logger.LogInformation("Update task remainder started");
+            _logger.LogInformation("Update task reminder started");
             if (!ModelState.IsValid)
             {
-                _logger.LogError("Entered wrong remainder data");
+                _logger.LogError("Entered wrong reminder data");
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
-            ErrorDTO response = _taskManagementService.IsUpdateRemainder(id, remainderDTO.RemainderPeriodId);
+            ErrorDTO response = _taskManagementService.IsUpdateReminder(id, reminderDTO.ReminderPeriodId);
             if(response != null)
             {
                 _logger.LogError("Task id not found");
                 return StatusCode(404,response);
             }
-            _taskManagementService.UpdateRemainder(id, remainderDTO.RemainderPeriodId);
-            _logger.LogInformation("Task remainder added successfully");
-            return Ok("Task remainder updated successfully");
+            _taskManagementService.UpdateReminder(id, reminderDTO.ReminderPeriodId);
+            _logger.LogInformation("Task reminder added successfully");
+            return Ok("Task reminder updated successfully");
         }
 
         ///<summary>
@@ -309,13 +309,13 @@ namespace TaskManagement.Controllers
         ///</summary>
         [AllowAnonymous]
         [HttpPost]
-        [Route("api/signup")]
+        [Route("api/auth/signup")]
         public IActionResult SignUp(SignUpDTO user)
         {
             _logger.LogInformation("sign up user started");
             if (!ModelState.IsValid)
             {
-                _logger.LogError("Entered wrong remainder data");
+                _logger.LogError("Entered wrong reminder data");
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
@@ -328,6 +328,21 @@ namespace TaskManagement.Controllers
             _logger.LogInformation("New user created");
             Guid id = _taskManagementService.SaveUser(user);
             return StatusCode(201,id);
+        }
+        ///<summary>
+        /// Gets reminder alert
+        ///</summary>
+        [HttpGet]
+        [Route("api/task/reminder")]
+        public IActionResult GetReminder()
+        {
+            _logger.LogInformation("Geting reminder details startd");
+            List<ReminderResponseDTO> response = _taskManagementService.GetReminder();
+            if(response != null)
+            {
+                return StatusCode(200,response);
+            }
+            return StatusCode(204,"No Reminders");
         }
 
     }

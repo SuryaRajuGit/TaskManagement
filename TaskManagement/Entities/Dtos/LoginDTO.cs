@@ -10,8 +10,8 @@ namespace TaskManagement.Dtos
     public class LoginDTO
     {
         [Required]
-        [JsonProperty(PropertyName = "user_name")]
-        public string UserName { get; set; }
+        [JsonProperty(PropertyName = "email")]
+        public string Email { get; set; }
 
         [Required]
         [JsonProperty(PropertyName = "password")]

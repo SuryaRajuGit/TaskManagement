@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManagement.Entities.Models;
 
 namespace TaskManagement.Models
 {
-    public class RefTerm
+    public class RefTerm : BaseModel
     {
-        ///<summary>
-        /// Id of the refterm 
-        ///</summary>
-        public Guid Id { get; set; }
 
         ///<summary>
         /// key of the refterm

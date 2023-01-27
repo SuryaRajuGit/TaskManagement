@@ -50,5 +50,13 @@ namespace TaskManagement.Entities.Dtos
         public const string Open = "OPEN";
 
         public const string Low = "LOW";
+
+        public const string  Date = "D";
+
+        public const string Complete = "COMPLETED";
+
+        public const string days_7 = "7_DAYS";
+
+        public const string days_3 = "3_DAYS";
     }
 }

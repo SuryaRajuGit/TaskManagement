@@ -96,11 +96,11 @@ namespace UnitTest_TaskManagement
             string refSetTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefSetTerm.csv";
             string refSetTermCSV = File.ReadAllText(refSetTermPath);
             string[] RefSetTermdata = refSetTermCSV.Split('\r');
-            List<RefSetTerm> SetRefTermlist = new List<RefSetTerm>();
+            List<SetRefTerm> SetRefTermlist = new List<SetRefTerm>();
             foreach (string item in RefSetTermdata)
             {
                 string[] row = item.Split(",");
-                RefSetTerm refObj = new RefSetTerm() { Id = Guid.NewGuid(), RefSetId = Guid.Parse(row[0]), RefTermId = Guid.Parse(row[1]) };
+                SetRefTerm refObj = new SetRefTerm() { Id = Guid.NewGuid(), RefSetId = Guid.Parse(row[0]), RefTermId = Guid.Parse(row[1]) };
                 SetRefTermlist.Add(refObj);
             }
             _context.AddRange(SetRefTermlist);
@@ -133,7 +133,7 @@ namespace UnitTest_TaskManagement
                 User user = new User()
                 {
                     Id = Guid.Parse(row[2]),
-                    UserName = row[0],
+                    Email = row[0],
                     Password = EncryptPassword,
                     Name=row[0],
                     Phone=row[3]
@@ -141,8 +141,6 @@ namespace UnitTest_TaskManagement
                 LoginList.Add(user);
             }
             _context.User.AddRange(LoginList);
-            //Assignee assig = new Assignee { Id = Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"), Name = "test" };
-            //_context.Assignee.Add(assig);
 
             string taskDatePath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\TaskData.csv";
             string taskCSV = File.ReadAllText(taskDatePath);
@@ -189,11 +187,11 @@ namespace UnitTest_TaskManagement
             LoginDTO login = new LoginDTO()
             {
                 Password = "passworD@123",
-                UserName = "surya"
+                Email = "surya"
             };
             LoginDTO inValidlogin = new LoginDTO()
             {
-                UserName="sury",
+                Email="sury",
                 Password = "password@123",
                
             };
@@ -327,12 +325,12 @@ namespace UnitTest_TaskManagement
         [Fact]
         public void Test_UpdateRemainder()
         {
-            RemainderDTO remainderDTO = new RemainderDTO()
+            ReminderDTO remainderDTO = new ReminderDTO()
             {
-                RemainderPeriodId = Guid.Parse("cd2a89f8-dd1a-4a62-8802-1ec27c2c3980")
+                ReminderPeriodId = Guid.Parse("cd2a89f8-dd1a-4a62-8802-1ec27c2c3980")
             };
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
-            IActionResult response = _taskManagementController.UpdateRemainder(id, remainderDTO);
+            IActionResult response = _taskManagementController.UpdateReminder(id, remainderDTO);
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
             Assert.Equal(200, result.StatusCode);
         }
@@ -350,14 +348,14 @@ namespace UnitTest_TaskManagement
             {
                 Name="Test Signup",
                 Password="Psr@964",
-                UserName="Test User",
+                Email="Test User",
                 Phone="8142255760"
             };
             SignUpDTO signUpDTO1 = new SignUpDTO()
             {
                 Name = "Test Signup",
                 Password = "Psr@964",
-                UserName = "Test User",
+                Email = "Test User",
                 Phone = "8142255769"
             };
             IActionResult response = _taskManagementController.SignUp(signUpDTO);

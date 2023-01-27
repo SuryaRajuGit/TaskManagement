@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskManagement.Entities.Models;
 
 namespace TaskManagement.Models
 {
-    public class Tasks
+    public class Tasks : BaseModel
     {
-        ///<summary>
-        /// Id of the Task 
-        ///</summary>
-        public Guid Id { get; set; }
 
         ///<summary>
         /// Name of the Task 

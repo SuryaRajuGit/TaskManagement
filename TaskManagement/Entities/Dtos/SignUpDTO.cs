@@ -10,8 +10,9 @@ namespace TaskManagement.Entities.Dtos
     public class SignUpDTO
     {
         [Required]
-        [JsonProperty(PropertyName = "user_name")]
-        public string UserName { get; set; }
+        [JsonProperty(PropertyName = "email")]
+        [RegularExpression(@"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", ErrorMessage = "Enter Valid email address")]
+        public string Email { get; set; }
 
       
         [Required]

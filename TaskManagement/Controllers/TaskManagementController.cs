@@ -330,7 +330,7 @@ namespace TaskManagement.Controllers
             return StatusCode(201,id);
         }
         ///<summary>
-        /// Gets reminder alert
+        /// Gets list of  reminder alerts
         ///</summary>
         [HttpGet]
         [Route("api/task/reminder")]
@@ -340,8 +340,10 @@ namespace TaskManagement.Controllers
             List<ReminderResponseDTO> response = _taskManagementService.GetReminder();
             if(response != null)
             {
+                _logger.LogInformation("list of remainders fetched successfully");
                 return StatusCode(200,response);
             }
+            _logger.LogInformation("No remainder details");
             return StatusCode(204,"No Reminders");
         }
 

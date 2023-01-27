@@ -686,6 +686,9 @@ namespace TaskManagement.Service
             return id;
         }
 
+        ///<summary>
+        /// Gets list of remainders
+        ///</summary>
         public List<ReminderResponseDTO> GetReminder()
         {
             Guid id = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);

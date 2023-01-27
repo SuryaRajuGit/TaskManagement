@@ -255,16 +255,6 @@ namespace TaskManagement.Service
                         sortList = paginatedList.OrderBy(item => item.Status).ToList();
                     }
                     break;
-                case Constants.Priority: 
-                    if (sortOrder == Constants.DSC)
-                    {
-                        sortList = paginatedList.OrderBy(item => item.Priority).ToList();
-                    }
-                    else
-                    {
-                        sortList = paginatedList.OrderByDescending(item => item.Priority).ToList();
-                    }
-                    break;
                 default:
                     sortList = paginatedList;
                     break;
@@ -672,7 +662,7 @@ namespace TaskManagement.Service
             userData.Password = EncryptPassword;
             Guid userId = Guid.NewGuid();
             userData.Id = userId;
-            userData.Name = user.Name;
+            userData.Name = user.Name; 
             userData.Phone = user.Phone;
             Guid id = _taskManagementRepository.SaveUser(userData);
             return id;

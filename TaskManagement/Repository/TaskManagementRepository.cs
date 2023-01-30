@@ -243,12 +243,6 @@ namespace TaskManagement.Repository
         {
             List<TaskAssigneeMapping> list = new List<TaskAssigneeMapping>();
             List<TaskAssigneeMapping> remove = _taskManagementContext.TaskAssigneeMapping.Where(find => find.TaskId == tasks.Id && find.IsActive == true).ToList();
-            //foreach (TaskAssigneeMapping item in _taskManagementContext.TaskAssigneeMapping.Where(find => find.TaskId == tasks.Id && find.IsActive == true))
-            //{
-            //    item.IsActive = false;
-            //    item.UpdatedId = tasks.Assigner;
-            //    item.UpdatedDate = DateTime.Now;
-            //}
             _taskManagementContext.TaskAssigneeMapping.RemoveRange(remove);
             _taskManagementContext.Tasks.Update(tasks);
            

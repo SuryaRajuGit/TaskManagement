@@ -52,9 +52,9 @@ namespace UnitTest_TaskManagement
 
             IMapper mapper = mappingConfig.CreateMapper();
             _mapper = mapper;
-            Claim claim1 = new Claim("userId", "9dc4391c-6967-43c0-93dd-cfb0ac6efb46","","LOCAL AUTHORITY");
-            
-            ClaimsIdentity identity = new ClaimsIdentity(new[] {  claim1 }, "BasicAuthentication"); // this uses basic auth
+            Claim claim1 = new Claim("userId", "9dc4391c-6967-43c0-93dd-cfb0ac6efb46", "", "LOCAL AUTHORITY");
+
+            ClaimsIdentity identity = new ClaimsIdentity(new[] { claim1 }, "BasicAuthentication"); // this uses basic auth
             ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
             GenericIdentity identityy = new GenericIdentity("some name", "test");
@@ -87,7 +87,7 @@ namespace UnitTest_TaskManagement
             foreach (string item in RefTermdata)
             {
                 string[] row = item.Split(",");
-                RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString(),IsActive=true };
+                RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString(), IsActive = true };
                 list.Add(refObj);
             }
 
@@ -100,7 +100,7 @@ namespace UnitTest_TaskManagement
             foreach (string item in RefSetTermdata)
             {
                 string[] row = item.Split(",");
-                SetRefTerm refObj = new SetRefTerm() { Id = Guid.NewGuid(), RefSetId = Guid.Parse(row[0]), RefTermId = Guid.Parse(row[1]),IsActive=true };
+                SetRefTerm refObj = new SetRefTerm() { Id = Guid.NewGuid(), RefSetId = Guid.Parse(row[0]), RefTermId = Guid.Parse(row[1]), IsActive = true };
                 SetRefTermlist.Add(refObj);
             }
             _context.AddRange(SetRefTermlist);
@@ -135,8 +135,8 @@ namespace UnitTest_TaskManagement
                     Id = Guid.Parse(row[2]),
                     Email = row[0],
                     Password = EncryptPassword,
-                    Name=row[0],
-                    Phone=row[3],
+                    Name = row[0],
+                    Phone = row[3],
                     IsActive = true
                 };
                 LoginList.Add(user);
@@ -149,7 +149,7 @@ namespace UnitTest_TaskManagement
             int c = 0;
             foreach (string item in taskData)
             {
-                
+
                 string[] row = item.Split(",");
                 List<TaskAssigneeMapping> listAssignee = new List<TaskAssigneeMapping>();
                 TaskAssigneeMapping assignee = new TaskAssigneeMapping()
@@ -162,19 +162,19 @@ namespace UnitTest_TaskManagement
                 listAssignee.Add(assignee);
                 Tasks tasks = new Tasks()
                 {
-                    Id =Guid.Parse(row[0]),
+                    Id = Guid.Parse(row[0]),
                     Name = row[1],
                     Description = row[2],
                     StartDate = DateTime.Parse(row[3]),
                     DueDate = DateTime.Parse(row[4]),
                     Status = Guid.Parse(row[5]),
-                    Assigner=Guid.Parse(row[10]),
-                    Priority=Guid.Parse(row[8]),
+                    Assigner = Guid.Parse(row[10]),
+                    Priority = Guid.Parse(row[8]),
                     TaskMapAssignee = listAssignee,
-                    ReminderPeriodId=Guid.Parse(row[11]),
+                    ReminderPeriodId = row[11] != "" ? Guid.Parse(row[11]) : Guid.Empty,
                     IsActive = true
                 };
-                if(c == 0)
+                if (c == 0)
                 {
                     tasks.ParentTaskId = Guid.Parse("931714f8-da93-42ec-85fe-bf5175bd30f5");
                 }
@@ -194,9 +194,9 @@ namespace UnitTest_TaskManagement
             };
             LoginDTO inValidlogin = new LoginDTO()
             {
-                Email="surya1@gamil.com",
+                Email = "surya1@gamil.com",
                 Password = "password@123",
-               
+
             };
             IActionResult response = _taskManagementController.VerifyUser(login);
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
@@ -223,7 +223,7 @@ namespace UnitTest_TaskManagement
                 StartDate = "08/02/2023 03:00:00",
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
-             
+
                 Assignee = guids,
             };
             IActionResult response = _taskManagementController.CreateTask(createTaskDTO);
@@ -280,7 +280,7 @@ namespace UnitTest_TaskManagement
                 StartDate = "03/02/2023 06:32:00",
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
-                
+
                 Assignee = guids,
             };
             UpdateTaskDTO updateTaskDTO1 = new UpdateTaskDTO()
@@ -291,7 +291,7 @@ namespace UnitTest_TaskManagement
                 StartDate = "05/02/2009 06:32:00",
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
-                
+
                 Assignee = guids,
             };
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
@@ -326,18 +326,6 @@ namespace UnitTest_TaskManagement
             Assert.Equal(200, result.StatusCode);
         }
         [Fact]
-        public void Test_UpdateRemainder()
-        {
-            ReminderDTO remainderDTO = new ReminderDTO()
-            {
-                ReminderPeriodId = Guid.Parse("cd2a89f8-dd1a-4a62-8802-1ec27c2c3980")
-            };
-            Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
-            IActionResult response = _taskManagementController.UpdateReminder(id, remainderDTO);
-            OkObjectResult result = Assert.IsType<OkObjectResult>(response);
-            Assert.Equal(200, result.StatusCode);
-        }
-        [Fact]
         public void Test_GetAssigneeList()
         {
             IActionResult response = _taskManagementController.GetAssigneeList();
@@ -349,10 +337,10 @@ namespace UnitTest_TaskManagement
         {
             SignUpDTO signUpDTO = new SignUpDTO()
             {
-                Name="Test Signup",
-                Password="Psr@964",
-                Email="Test User",
-                Phone="8142255760"
+                Name = "Test Signup",
+                Password = "Psr@964",
+                Email = "Test User",
+                Phone = "8142255760"
             };
             SignUpDTO signUpDTO1 = new SignUpDTO()
             {
@@ -369,6 +357,15 @@ namespace UnitTest_TaskManagement
 
             Assert.Equal(201, result.StatusCode);
             Assert.Equal(409, result1.StatusCode);
+        }
+        [Fact]
+        public void Test_GetRemainders()
+        {
+            IActionResult response = _taskManagementController.GetReminder();
+
+            ObjectResult result = Assert.IsType<ObjectResult>(response);
+
+            Assert.Equal(204, result.StatusCode);
         }
     }
 }

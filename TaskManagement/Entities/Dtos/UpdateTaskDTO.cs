@@ -36,5 +36,6 @@ namespace TaskManagement.Entities.Dtos
        
         [JsonProperty(PropertyName = "status")]
         public Guid Status { get; set; }
+
     }
 }

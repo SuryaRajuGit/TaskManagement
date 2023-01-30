@@ -87,7 +87,7 @@ namespace UnitTest_TaskManagement
             foreach (string item in RefTermdata)
             {
                 string[] row = item.Split(",");
-                RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
+                RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString(),IsActive=true };
                 list.Add(refObj);
             }
 
@@ -100,7 +100,7 @@ namespace UnitTest_TaskManagement
             foreach (string item in RefSetTermdata)
             {
                 string[] row = item.Split(",");
-                SetRefTerm refObj = new SetRefTerm() { Id = Guid.NewGuid(), RefSetId = Guid.Parse(row[0]), RefTermId = Guid.Parse(row[1]) };
+                SetRefTerm refObj = new SetRefTerm() { Id = Guid.NewGuid(), RefSetId = Guid.Parse(row[0]), RefTermId = Guid.Parse(row[1]),IsActive=true };
                 SetRefTermlist.Add(refObj);
             }
             _context.AddRange(SetRefTermlist);
@@ -112,7 +112,7 @@ namespace UnitTest_TaskManagement
             foreach (string item in refSetdata)
             {
                 string[] row = item.Split(",");
-                RefSet refObj = new RefSet { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString() };
+                RefSet refObj = new RefSet { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString(), IsActive = true };
                 refSetList.Add(refObj);
             }
             _context.RefSet.AddRange(refSetList);
@@ -136,7 +136,8 @@ namespace UnitTest_TaskManagement
                     Email = row[0],
                     Password = EncryptPassword,
                     Name=row[0],
-                    Phone=row[3]
+                    Phone=row[3],
+                    IsActive = true
                 };
                 LoginList.Add(user);
             }
@@ -155,7 +156,8 @@ namespace UnitTest_TaskManagement
                 {
                     Id = Guid.Parse(row[9]),
                     AssigneeId = Guid.Parse(row[10]),
-                    TaskId = Guid.Parse(row[0])
+                    TaskId = Guid.Parse(row[0]),
+                    IsActive = true
                 };
                 listAssignee.Add(assignee);
                 Tasks tasks = new Tasks()
@@ -169,7 +171,8 @@ namespace UnitTest_TaskManagement
                     Assigner=Guid.Parse(row[10]),
                     Priority=Guid.Parse(row[8]),
                     TaskMapAssignee = listAssignee,
-                    ReminderPeriodId=Guid.Parse(row[11])
+                    ReminderPeriodId=Guid.Parse(row[11]),
+                    IsActive = true
                 };
                 if(c == 0)
                 {
@@ -187,11 +190,11 @@ namespace UnitTest_TaskManagement
             LoginDTO login = new LoginDTO()
             {
                 Password = "passworD@123",
-                Email = "surya"
+                Email = "psurya@gmail.com"
             };
             LoginDTO inValidlogin = new LoginDTO()
             {
-                Email="sury",
+                Email="surya1@gamil.com",
                 Password = "password@123",
                
             };

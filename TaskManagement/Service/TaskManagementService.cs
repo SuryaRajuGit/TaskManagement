@@ -410,7 +410,8 @@ namespace TaskManagement.Service
                     AssigneeId = sel,
                     TaskId = id,
                     UpdatedDate= DateTime.Now,
-                    UpdatedId= userId
+                    UpdatedId= userId,
+                    IsActive = true
                 }).ToList();
             }
             
@@ -558,13 +559,21 @@ namespace TaskManagement.Service
                 return new ErrorDTO() {type="BadRequest",description="DueDate must be greater than StartDate" };
             }
             //Gets remainder days with remainder id
+
+           
+            if(reminderId == Guid.Empty)
+            {
+                return null;
+            }
             string reminderDays = _taskManagementRepository.GetReminderDays(reminderId);
             char daysChar = reminderDays[0];
-            int reaminderDays = int.Parse(daysChar.ToString());
-            int endDays = DateTime.Parse(end).Day;
-            int startDays = DateTime.Parse(start).Day;
 
-            if ((endDays - startDays) < reaminderDays && reminderId != Guid.Empty)
+            DateTime endDateString = DateTime.Parse(DateTime.Parse(end).ToString(Constants.Date));
+            DateTime dueDateString = DateTime.Parse(DateTime.Parse(start).ToString(Constants.Date));
+
+            int reaminderDays = int.Parse(daysChar.ToString());
+
+            if ((endDateString - dueDateString).Days < reaminderDays && reminderId != Guid.Empty)
             {
                 return new ErrorDTO() { type = "BadRequest", description = "Invalid Remainder days" };
             }
@@ -713,6 +722,7 @@ namespace TaskManagement.Service
             userData.Phone = user.Phone;
             userData.IsActive = true;
             userData.CreatedDate = DateTime.Now;
+            userData.CreatedId = userId;
             // Saves user details and return id
             Guid id = _taskManagementRepository.SaveUser(userData);
             return id;
@@ -742,27 +752,50 @@ namespace TaskManagement.Service
                 string dueDateString = item.DueDate.ToString(Constants.Date);
                 DateTime dueDate = DateTime.Parse(dueDateString);
 
-                string currentString = item.StartDate.ToString(Constants.Date);
+                string currentString = currentDay.ToString(Constants.Date);
                 DateTime currentDate = DateTime.Parse(currentString);
 
-                string starttString = item.StartDate.ToString(Constants.Date);
-                DateTime startDate = DateTime.Parse(starttString);
+                string startString = item.StartDate.ToString(Constants.Date);
+                DateTime startDate = DateTime.Parse(startString);
 
-                DateTime remainderDay = dueDate.AddDays(days);
-                if(remainderDay >= currentDate)
+                DateTime remainderDay = dueDate.AddDays(-days);
+
+                if(remainderDay <= currentDate)
                 {
                     ReminderResponseDTO reminder = new ReminderResponseDTO()
                     {
                         Name = item.Name,
                         TaskId = item.Id,
-                        ReminderMessage = $"Task due date {item.DueDate} "
+                        ReminderMessage = $"Task due date {item.DueDate}"
                     };
                     list.Add(reminder);
                 }          
             }
+
             if(list.Count() != 0)
             {
                 return list;
+            }
+            return null;
+        }
+        public ErrorDTO IsDateValid(Guid id, Guid reminderId)
+        {
+            Tasks task = _taskManagementRepository.GetTask(id);
+            string remainder = _taskManagementRepository.GetReminderDays(reminderId);
+            char daysChar = remainder[0];
+            int days = int.Parse(daysChar.ToString());
+            DateTime startDate = task.StartDate;
+            DateTime dueDate = task.DueDate;
+
+            DateTime start = DateTime.Parse(startDate.ToString(Constants.Date));
+            DateTime due =DateTime.Parse(dueDate.ToString(Constants.Date));
+
+            DateTime current = DateTime.Now;
+            DateTime currentDate = DateTime.Parse(current.ToString(Constants.Date));
+
+            if((currentDate >= due.AddDays(-days)) || (due - start ).TotalDays < days )
+            {
+                return new ErrorDTO() {type="BadRequest",description="Invalid Reminder period" };
             }
             return null;
         }

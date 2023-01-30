@@ -159,5 +159,7 @@ namespace TaskManagement.Contracts
         ///</summary>
         public List<ReminderResponseDTO> GetReminder();
 
+
+        public ErrorDTO IsDateValid(Guid id,Guid remainderId);
     }
 }

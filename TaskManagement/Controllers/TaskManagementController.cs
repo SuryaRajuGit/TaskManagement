@@ -275,6 +275,11 @@ namespace TaskManagement.Controllers
                 ErrorDTO badRequest = _taskManagementService.ModelStateInvalid(ModelState);
                 return BadRequest(badRequest);
             }
+            ErrorDTO isDateValid = _taskManagementService.IsDateValid(id,reminderDTO.ReminderPeriodId);
+            if(isDateValid != null)
+            {
+                return StatusCode(400,isDateValid);
+            }
             ErrorDTO response = _taskManagementService.IsUpdateReminder(id, reminderDTO.ReminderPeriodId);
             if(response != null)
             {

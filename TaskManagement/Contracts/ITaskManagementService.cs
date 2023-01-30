@@ -121,7 +121,7 @@ namespace TaskManagement.Contracts
         /// <param name = "end" ></ param >
         /// <param name = "start" ></ param >
         ///</summary>
-        public ErrorDTO IsDateInvalid(string datetime,string time,Guid reminderId);
+        public ErrorDTO IsDateInvalid(DateTime datetime,DateTime time,Guid reminderId);
 
         ///<summary>
         /// Checks start date is lesser than due date

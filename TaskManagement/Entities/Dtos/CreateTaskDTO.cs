@@ -26,13 +26,13 @@ namespace TaskManagement.Entities.Dtos
         /// start date of the task
         ///</summary>
         [JsonProperty(PropertyName = "start_date")]
-        public string StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         ///<summary>
         /// Due date of the task
         ///</summary>
         [JsonProperty(PropertyName = "due_date")]
-        public string DueDate { get; set; }
+        public DateTime DueDate { get; set; }
 
         ///<summary>
         /// Priority of the task

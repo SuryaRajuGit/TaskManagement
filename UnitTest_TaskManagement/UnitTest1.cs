@@ -227,8 +227,8 @@ namespace UnitTest_TaskManagement
             {
                 Name = "test",
                 Description = "test",
-                DueDate = "09/02/2023 03:00:00",
-                StartDate = "08/02/2023 03:00:00",
+                DueDate =DateTime.Parse( "09/02/2023 03:00:00"),
+                StartDate =DateTime.Parse( "08/02/2023 03:00:00"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
 
@@ -238,8 +238,8 @@ namespace UnitTest_TaskManagement
             {
                 Name = "name",
                 Description = "test",
-                DueDate = "09/02/2023 03:00:00",
-                StartDate = "08/02/2023 03:00:00",
+                DueDate =DateTime.Parse( "09/02/2023 03:00:00"),
+                StartDate =DateTime.Parse( "08/02/2023 03:00:00"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
 
@@ -308,8 +308,8 @@ namespace UnitTest_TaskManagement
             {
                 Name = "Suryaraju",
                 Description = "test up",
-                DueDate = "04/03/2023 15:32:00",
-                StartDate = "03/02/2023 06:32:00",
+                DueDate = DateTime.Parse("04/03/2023 15:32:00"),
+                StartDate =DateTime.Parse( "03/02/2023 06:32:00"),
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
                 Assignee = guids,
@@ -318,8 +318,8 @@ namespace UnitTest_TaskManagement
             {
                 Name = "Suryaraju",
                 Description = "test up",
-                DueDate = "03/03/2023 15:32:00",
-                StartDate = "05/02/2009 06:32:00",
+                DueDate = DateTime.Parse("03/03/2023 15:32:00"),
+                StartDate =DateTime.Parse( "05/02/2009 06:32:00"),
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
 

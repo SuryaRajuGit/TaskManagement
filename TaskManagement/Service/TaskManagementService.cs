@@ -135,7 +135,7 @@ namespace TaskManagement.Service
         {
             if(task.StartDate == null && task.DueDate != null)
             {
-                task.StartDate =   DateTime.Now.ToString();
+                task.StartDate = DateTime.Now;
             }
             //Checks task name exist or not and returns bool 
             bool isTaskNameExist = _taskManagementRepository.IsTaskNameExist(task.Name);
@@ -143,10 +143,9 @@ namespace TaskManagement.Service
             {
                 return null;
             }
-            DateTime startDate;
-            DateTime dueDate;
-            DateTime.TryParse(task.StartDate, out startDate);
-            DateTime.TryParse(task.DueDate, out dueDate);
+            DateTime startDate = task.StartDate;
+            DateTime dueDate= task.DueDate;
+
             Guid taskId = Guid.NewGuid(); 
             // gets user id from claims
             Guid id = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);
@@ -344,7 +343,7 @@ namespace TaskManagement.Service
             }
             if (updateTask.StartDate == null && updateTask.DueDate != null)
             {
-                updateTask.StartDate = DateTime.Now.ToString();
+                updateTask.StartDate = DateTime.Now;
             }
             //Gets task details with task id
             Tasks task = _taskManagementRepository.GetTask(id);
@@ -354,10 +353,10 @@ namespace TaskManagement.Service
             task.Description = updateTask.Description;
             if (updateTask.StartDate == null && updateTask.DueDate == null)
             {
-                updateTask.StartDate = DateTime.MinValue.ToString();
-                updateTask.DueDate = DateTime.MinValue.ToString();
+                updateTask.StartDate = DateTime.MinValue;
+                updateTask.DueDate = DateTime.MinValue;
             }
-            task.StartDate = DateTime.Parse(updateTask.StartDate);
+            task.StartDate =updateTask.StartDate;
             task.Priority = updateTask.Priority;
             task.Status = updateTask.Status;
             if (updateTask.Priority == Guid.Empty )
@@ -368,7 +367,7 @@ namespace TaskManagement.Service
             {
                 task.Status = _taskManagementRepository.GetStatusId();
             }
-            task.DueDate = DateTime.Parse(updateTask.DueDate);
+            task.DueDate = updateTask.DueDate;
             //Gets user id from claims
             Guid userId = Guid.Parse(_context.HttpContext.User.Claims.First(sel => sel.Issuer == Constants.Issuer).Value);
             if (updateTask.Assignee != null)
@@ -487,11 +486,11 @@ namespace TaskManagement.Service
         /// <param name = "end" ></ param >
         /// <param name = "start" ></ param >
         ///</summary>
-        public ErrorDTO IsDateInvalid(string end,string start,Guid reminderId)
+        public ErrorDTO IsDateInvalid(DateTime end,DateTime start,Guid reminderId)
         {
 
             DateTime dateTime = DateTime.Now;
-            if (end == null && start == null)
+            if (end == DateTime.MinValue && start == DateTime.MinValue)
             {
                 return null;
             }
@@ -503,23 +502,15 @@ namespace TaskManagement.Service
             {
                 TimeSpan time = new TimeSpan(0, 0, 0, 1);
                 DateTime combined = dateTime.Add(time);
-                start = combined.ToString();
-            }
-            if (!DateTime.TryParse(start, out DateTime startDate))
-            {
-                return new ErrorDTO() { type = "BadRequest", description = $"Invalid start datetime {start}" };
-            }
-            if (!DateTime.TryParse(end, out DateTime endDate))
-            {
-                return new ErrorDTO() { type = "BadRequest", description = $"Invalid due datetime {end}" };
+                start = combined;
             }
             string day = dateTime.ToString(Constants.Date);
             DateTime currentDay = DateTime.Parse(day);
-            if (currentDay > startDate && currentDay != startDate)
+            if (currentDay > start && currentDay != start)
             {
                 return new ErrorDTO() { type="BadRequest",description="Invalid  start datetime"};
             }
-            if (Convert.ToDateTime(startDate) >= Convert.ToDateTime(endDate))
+            if (Convert.ToDateTime(start) >= Convert.ToDateTime(end))
             {
                 return new ErrorDTO() {type="BadRequest",description="DueDate must be greater than StartDate" };
             }
@@ -533,8 +524,8 @@ namespace TaskManagement.Service
             string reminderDays = _taskManagementRepository.GetReminderDays(reminderId);
             char daysChar = reminderDays[0];
 
-            DateTime endDateString = DateTime.Parse(DateTime.Parse(end).ToString(Constants.Date));
-            DateTime dueDateString = DateTime.Parse(DateTime.Parse(start).ToString(Constants.Date));
+            DateTime endDateString = DateTime.Parse(end.ToString(Constants.Date));
+            DateTime dueDateString = DateTime.Parse(start.ToString(Constants.Date));
 
             int reaminderDays = int.Parse(daysChar.ToString());
 
@@ -555,18 +546,18 @@ namespace TaskManagement.Service
             {
                 return null;
             }
-            if(createTask.StartDate ==  null && createTask.DueDate == null)
+            if(createTask.StartDate ==  DateTime.MinValue && createTask.DueDate == DateTime.MinValue)
             {
                 return null;
             }
             if(createTask.StartDate == null)
             {
-                createTask.StartDate = DateTime.Now.ToString();
+                createTask.StartDate = DateTime.Now;
             }
-            DateTime startDate = DateTime.Parse(createTask.StartDate);
-            DateTime dueDate = DateTime.Parse(createTask.DueDate);
+            DateTime startDate = createTask.StartDate;
+            DateTime dueDate = createTask.DueDate;
             //Gets parent task with id
-            Tasks parentTask = _taskManagementRepository.IsParentTaskDatesValid(createTask.DueDate, createTask.StartDate, createTask.ParentTaskId);
+            Tasks parentTask = _taskManagementRepository.IsParentTaskDatesValid(createTask.DueDate.ToString(), createTask.StartDate.ToString(), createTask.ParentTaskId);
             if(parentTask.DueDate == DateTime.MinValue && parentTask.StartDate == DateTime.MinValue)
             {
                 return null;
@@ -638,8 +629,8 @@ namespace TaskManagement.Service
             {
                 return null;
             }
-            DateTime startDate = DateTime.Parse(task.StartDate);
-            DateTime dueDate = DateTime.Parse(task.DueDate);
+            DateTime startDate = task.StartDate;
+            DateTime dueDate = task.DueDate;
             if (Convert.ToDateTime(parentTask.StartDate) > Convert.ToDateTime(startDate) || Convert.ToDateTime(startDate) > Convert.ToDateTime(parentTask.DueDate))
             {
                 return new ErrorDTO() { type = "BadRequest", description = "StartDate must be with the time period of parent task" };

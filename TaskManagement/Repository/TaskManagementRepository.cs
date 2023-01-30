@@ -184,11 +184,11 @@ namespace TaskManagement.Repository
                 IsActive = sel.IsActive,
                 AssigneeId = sel.AssigneeId,
                 CreatedDate = sel.CreatedDate,
-                CreatedId = sel.CreatedId,
+                CreatedBy = sel.CreatedBy,
                 Id = sel.Id,
                 TaskId = sel.TaskId,
                 UpdatedDate = sel.UpdatedDate,
-                UpdatedId = sel.UpdatedId
+                UpdatedBy = sel.UpdatedBy
             }).ToList();
             return task;
                 
@@ -272,12 +272,12 @@ namespace TaskManagement.Repository
             {
                 item.IsActive = false;
                 item.UpdatedDate = DateTime.Now;
-                item.UpdatedId = item.Assigner;
+                item.UpdatedBy = item.Assigner;
                 foreach (TaskAssigneeMapping each in item.TaskMapAssignee)
                 {
                     each.IsActive = false;
                     each.UpdatedDate = DateTime.Now;
-                    each.UpdatedId = item.Id;
+                    each.UpdatedBy = item.Id;
                 }
             }
             _taskManagementContext.Tasks.UpdateRange(task);
@@ -302,7 +302,7 @@ namespace TaskManagement.Repository
             Tasks task = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive == true).First();
             task.Status = statusId;
             task.UpdatedDate = DateTime.Now;
-            task.UpdatedId = task.Assigner;
+            task.UpdatedBy = task.Assigner;
             _taskManagementContext.SaveChanges();
         }
 
@@ -314,7 +314,7 @@ namespace TaskManagement.Repository
             Tasks task = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive == true).First();
             task.ReminderPeriodId = reminderId;
             task.UpdatedDate = DateTime.Now;
-            task.UpdatedId = task.Assigner;
+            task.UpdatedBy = task.Assigner;
             _taskManagementContext.SaveChanges();
         }
 

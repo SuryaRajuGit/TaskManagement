@@ -25,12 +25,12 @@ namespace TaskManagement.Entities.Models
         ///<summary>
         /// Created user id 
         ///</summary>
-        public Guid CreatedId { get; set; }
+        public Guid CreatedBy { get; set; }
 
         ///<summary>
         /// Updated user id 
         ///</summary>
-        public Guid UpdatedId { get; set; }
+        public Guid UpdatedBy { get; set; }
 
         ///<summary>
         /// Is soft deleted

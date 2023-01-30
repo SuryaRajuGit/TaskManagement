@@ -9,6 +9,9 @@ namespace TaskManagement.Entities.Dtos
 {
     public class StatusDTO
     {
+        ///<summary>
+        /// Status of the task
+        ///</summary>
         [Required]
         [JsonProperty(PropertyName = "status")]
         public Guid Status { get; set; }

@@ -174,7 +174,7 @@ namespace TaskManagement.Service
                         AssigneeId = item,
                         TaskId = taskId,
                         CreatedDate=DateTime.Now,
-                        CreatedId=id,
+                        CreatedBy=id,
                         IsActive=true
                     };
                     tasksList.Add(taskAssignee);
@@ -377,7 +377,7 @@ namespace TaskManagement.Service
                     AssigneeId = sel,
                     TaskId = id,
                     UpdatedDate= DateTime.Now,
-                    UpdatedId= userId,
+                    UpdatedBy= userId,
                     IsActive = true
                 }).ToList();
             }
@@ -685,7 +685,7 @@ namespace TaskManagement.Service
             userData.Phone = user.Phone;
             userData.IsActive = true;
             userData.CreatedDate = DateTime.Now;
-            userData.CreatedId = userId;
+            userData.CreatedBy = userId;
             // Saves user details and return id
             Guid id = _taskManagementRepository.SaveUser(userData);
             return id;

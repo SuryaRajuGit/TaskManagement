@@ -9,12 +9,17 @@ namespace TaskManagement.Entities.Dtos
 {
     public class SignUpDTO
     {
+        ///<summary>
+        /// Email of the user
+        ///</summary>
         [Required]
         [JsonProperty(PropertyName = "email")]
         [RegularExpression(@"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z", ErrorMessage = "Enter Valid email address")]
         public string Email { get; set; }
 
-      
+        ///<summary>
+        /// Password do the user
+        ///</summary>
         [Required]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,15}$",
             ErrorMessage = "Passwords must be at least 8 characters, one upper case (A-Z)," +
@@ -22,12 +27,18 @@ namespace TaskManagement.Entities.Dtos
         [JsonProperty(PropertyName = "password")]
         public string Password { get; set; }
 
+        ///<summary>
+        /// Phone of the user
+        ///</summary>
         [Required]
         [Phone(ErrorMessage = "PhoneNumber field is not a valid phone number")]
         [MinLength(10)]
         [JsonProperty(PropertyName = "phone")]
         public string Phone { get; set; }
 
+        ///<summary>
+        /// Name of the user
+        ///</summary>
         [Required]
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }

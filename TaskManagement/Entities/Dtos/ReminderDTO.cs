@@ -9,6 +9,9 @@ namespace TaskManagement.Entities.Dtos
 {
     public class ReminderDTO
     {
+        ///<summary>
+        /// Reminder period of the task
+        ///</summary>
         [Required]
         [JsonProperty(PropertyName = "reminder_period")]
         public Guid ReminderPeriodId { get; set; }

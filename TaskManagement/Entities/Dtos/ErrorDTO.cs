@@ -7,8 +7,14 @@ namespace TaskManagement.Dtos
 {
     public class ErrorDTO
     {
+        ///<summary>
+        /// Type of the error
+        ///</summary>
         public string type { get; set; }
 
+        ///<summary>
+        /// Error description
+        ///</summary>
         public string description { get; set; }
     }
 }

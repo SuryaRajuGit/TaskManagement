@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Security;
 using System.Security.Claims;
@@ -246,7 +247,7 @@ namespace TaskManagement.Service
                 getTaskDTO.Priority = termData.Where(find => find.Id == item.Priority).Select(sel => sel.Key).First();
                 getTaskDTO.Status = termData.Where(find => find.Id == item.Status).Select(sel => sel.Key).First();
                 //Gets list of assignee names  with assignee ids
-                getTaskDTO.Assignee = _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(each => each.AssigneeId).ToList());
+                getTaskDTO.Assignee = _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(eac => eac.AssigneeId).ToList());
                 taskList.Add(getTaskDTO);
             }
             return taskList;
@@ -272,7 +273,7 @@ namespace TaskManagement.Service
             getSingleTaskDTO.Status = termData.Where(find => find.Id == task.Status).Select(sel => sel.Key).First();
             getSingleTaskDTO.Priority = termData.Where(find => find.Id == task.Priority).Select(sel => sel.Key).First();
             // Gets assignee names with list of assignee ids
-            getSingleTaskDTO.Assignee = _taskManagementRepository.GetAssigneeName(task.TaskMapAssignee.Select(each => each.AssigneeId).ToList());
+            getSingleTaskDTO.Assignee = _taskManagementRepository.GetAssigneeName(task.TaskMapAssignee.Select(eac => eac.AssigneeId).ToList());
             // Gets assigner name
             getSingleTaskDTO.Assigner = _taskManagementRepository.GetAssigner(task.Assigner);
             List<SubTaskDTO> subTaskList = new List<SubTaskDTO>();
@@ -284,7 +285,7 @@ namespace TaskManagement.Service
                     Id = item.Id,
                     Name = item.Name,
                     //Gets assignee names with list of assignee ids
-                    Assignee = _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(each => each.AssigneeId).ToList())
+                    Assignee = _taskManagementRepository.GetAssigneeName(item.TaskMapAssignee.Select(eac => eac.AssigneeId).ToList())
                 };
                 subTaskList.Add(subTask);
             }
@@ -430,7 +431,7 @@ namespace TaskManagement.Service
         ///</summary>
         public void UpdateStatus(Guid id,Guid userId)
         {
-            _taskManagementRepository.UpdateStatus(id,userId);
+            _taskManagementRepository.UpdateStatus(id,userId,Guid.Empty);
         }
 
         ///<summary>
@@ -462,7 +463,7 @@ namespace TaskManagement.Service
         ///</summary>
         public void UpdateReminder(Guid id, Guid reminderId)
         {
-            _taskManagementRepository.UpdateReminder(id,reminderId);
+            _taskManagementRepository.UpdateStatus(id,reminderId ,id);
         }
 
         ///<summary>
@@ -488,6 +489,7 @@ namespace TaskManagement.Service
         ///</summary>
         public ErrorDTO IsDateInvalid(string end,string start,Guid reminderId)
         {
+
             DateTime dateTime = DateTime.Now;
             if (end == null && start == null)
             {

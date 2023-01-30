@@ -14,12 +14,10 @@ namespace TaskManagement.Repository
     public class TaskManagementRepository : ITaskManagementRepository
     {
         private readonly TaskManagementContext _taskManagementContext;
-        private readonly IMapper _mapper;
 
-        public TaskManagementRepository(TaskManagementContext taskManagementContext, IMapper mapper)
+        public TaskManagementRepository(TaskManagementContext taskManagementContext)
         {
             _taskManagementContext = taskManagementContext;
-            _mapper = mapper;
         }
 
         ///<summary>
@@ -28,7 +26,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool IsUserExist(string email)
         {
-            return _taskManagementContext.User.Any(item => item.Email == email && item.IsActive == true);
+            return _taskManagementContext.User.Any(item => item.Email == email && item.IsActive );
         }
 
         ///<summary>
@@ -37,7 +35,7 @@ namespace TaskManagement.Repository
         ///<return>string</return>
         public string GetPassword(string email)
         {
-            return _taskManagementContext.User.Where(find => find.Email == email && find.IsActive == true).Select(term => term.Password ).FirstOrDefault();
+            return _taskManagementContext.User.Where(find => find.Email == email && find.IsActive).Select(term => term.Password ).FirstOrDefault();
         }
 
         ///<summary>
@@ -46,12 +44,12 @@ namespace TaskManagement.Repository
         ///<return>List<RefTerm></return>
         public List<RefTerm> GetRefSetData(string key)
         {
-            bool isExists = _taskManagementContext.RefSet.Any(cus => cus.Key == key && cus.IsActive == true);
+            bool isExists = _taskManagementContext.RefSet.Any(cus => cus.Key == key && cus.IsActive );
             if (!isExists)
             {
                 return null;
             }
-            List<RefTerm> refTermList = _taskManagementContext.SetRefTerm.Include(src => src.RefSet).Include(src => src.RefTerm).Where(wrt => wrt.RefSet.Key == key && wrt.IsActive == true).Select(src => src.RefTerm).ToList();
+            List<RefTerm> refTermList = _taskManagementContext.SetRefTerm.Include(src => src.RefSet).Include(src => src.RefTerm).Where(wrt => wrt.RefSet.Key == key && wrt.IsActive ).Select(src => src.RefTerm).ToList();
             return refTermList;
         }
 
@@ -61,7 +59,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool IsTaskNameExist(string name)
         {
-            return _taskManagementContext.Tasks.Any(find => find.Name == name && find.IsActive == true);
+            return _taskManagementContext.Tasks.Any(find => find.Name == name && find.IsActive);
         }
         ///<summary>
         /// Checks task name already exist or not
@@ -69,7 +67,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool IsUpdateTaskNameExist(string name,Guid id)
         {
-            return _taskManagementContext.Tasks.Any(find => find.Name == name && find.Id != id && find.IsActive == true);
+            return _taskManagementContext.Tasks.Any(find => find.Name == name && find.Id != id && find.IsActive );
         }
         ///<summary>
         /// Saves task details
@@ -88,7 +86,7 @@ namespace TaskManagement.Repository
         ///<return>List<RefTerm></return>
         public bool IsUserIdExist(Guid id)
         {
-            return _taskManagementContext.User.Any(find => find.Id == id && find.IsActive == true);
+            return _taskManagementContext.User.Any(find => find.Id == id && find.IsActive );
         }
 
         ///<summary>
@@ -115,17 +113,17 @@ namespace TaskManagement.Repository
         {
             List<Tasks> list = new List<Tasks>();
             
-            foreach (Tasks item in _taskManagementContext.Tasks.Include(s => s.TaskMapAssignee).Where(find => find.IsActive == true).Skip((pageNo - Constants.pageNO) * Constants.pagesize).Take(size))
+            foreach (Tasks item in _taskManagementContext.Tasks.Include(s => s.TaskMapAssignee).Where(find => find.IsActive ).Skip((pageNo - Constants.pageNO) * Constants.pagesize).Take(size))
             {
                 bool isExist =  item.Assigner == id || item.TaskMapAssignee.Select(s => s.AssigneeId).ToList().Contains(id);
                 if (isExist)
                 {
                     List<TaskAssigneeMapping> taskMap = new List<TaskAssigneeMapping>();
-                    foreach (TaskAssigneeMapping each in item.TaskMapAssignee)
+                    foreach (TaskAssigneeMapping term in item.TaskMapAssignee)
                     {
-                        if (each.IsActive == true)
+                        if (term.IsActive == true)
                         {
-                            taskMap.Add(each);
+                            taskMap.Add(term);
                         }
                     }
                     item.TaskMapAssignee = taskMap;
@@ -141,7 +139,7 @@ namespace TaskManagement.Repository
         ///<return>List<RefSetTerm></return>
         public List<SetRefTerm> GetTermData()
         {
-            return _taskManagementContext.SetRefTerm.Where(find => find.IsActive == true).ToList();
+            return _taskManagementContext.SetRefTerm.Where(find => find.IsActive).ToList();
         }
 
         ///<summary>
@@ -150,7 +148,7 @@ namespace TaskManagement.Repository
         ///<return>List<RefTerm></return>
         public List<RefTerm> GetSetData()
         {
-            return _taskManagementContext.RefTerm.Where(find => find.IsActive == true).ToList();
+            return _taskManagementContext.RefTerm.Where(find => find.IsActive ).ToList();
         }
 
         ///<summary>
@@ -162,7 +160,7 @@ namespace TaskManagement.Repository
             List<string> assignee = new List<string>();
             foreach (User item in _taskManagementContext.User)
             {
-                if(assigneeList.Contains(item.Id) && item.IsActive == true)
+                if(assigneeList.Contains(item.Id) && item.IsActive )
                 {
                     assignee.Add(item.Name);
                 }
@@ -176,20 +174,11 @@ namespace TaskManagement.Repository
         ///<return>List<RefTerm></return>
         public Tasks GetTask(Guid id)
         {
-            Tasks task = _taskManagementContext.Tasks.Include(sel => sel.TaskMapAssignee).Where(fin => fin.IsActive == true && fin.Id == id).First();
-            task.TaskMapAssignee =
-            task.TaskMapAssignee.Where(fin => fin.IsActive == true).Select(sel =>
-            new TaskAssigneeMapping
+            Tasks task = _taskManagementContext.Tasks.Include(sel => sel.TaskMapAssignee).Where(fin => fin.IsActive  && fin.Id == id).FirstOrDefault();
+            if(task == null)
             {
-                IsActive = sel.IsActive,
-                AssigneeId = sel.AssigneeId,
-                CreatedDate = sel.CreatedDate,
-                CreatedBy = sel.CreatedBy,
-                Id = sel.Id,
-                TaskId = sel.TaskId,
-                UpdatedDate = sel.UpdatedDate,
-                UpdatedBy = sel.UpdatedBy
-            }).ToList();
+                return null;
+            }
             return task;
                 
         }
@@ -200,11 +189,11 @@ namespace TaskManagement.Repository
         ///<return>List<Tasks></return>
         public List<Tasks> GetSubTasks(Guid id)
         {
-            return _taskManagementContext.Tasks.Where(find => find.IsActive == true  && find.ParentTaskId == id).
+            return _taskManagementContext.Tasks.Where(find => find.IsActive   && find.ParentTaskId == id).
                 Select(sel => new Tasks {
                     Id=sel.Id,
                     Name=sel.Name,
-                    TaskMapAssignee = sel.TaskMapAssignee.Where(find => find.IsActive == true).ToList()
+                    TaskMapAssignee = sel.TaskMapAssignee.Where(find => find.IsActive ).ToList()
                 }).ToList();
         }
 
@@ -214,7 +203,7 @@ namespace TaskManagement.Repository
         ///<return>stirng</return>
         public string GetAssigner(Guid id)
         {
-            return _taskManagementContext.User.Where(find => find.Id == id && find.IsActive == true).Select(sel => sel.Name).First();
+            return _taskManagementContext.User.Where(find => find.Id == id && find.IsActive ).Select(sel => sel.Name).First();
         }
 
         ///<summary>
@@ -223,7 +212,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool IsTaskIdExist(Guid id)
         {
-            return _taskManagementContext.Tasks.Any(find => find.Id == id && find.IsActive == true);
+            return _taskManagementContext.Tasks.Any(find => find.Id == id && find.IsActive );
         }
 
         ///<summary>
@@ -234,7 +223,7 @@ namespace TaskManagement.Repository
         {
             foreach (Guid item in ids)
             {
-                bool isExist = _taskManagementContext.User.Any(sel => sel.Id == item && sel.IsActive == true);
+                bool isExist = _taskManagementContext.User.Any(sel => sel.Id == item && sel.IsActive);
                 if(!isExist)
                 {
                     return item;
@@ -249,7 +238,7 @@ namespace TaskManagement.Repository
         public void UpdateTask(Tasks tasks)
         {
             List<TaskAssigneeMapping> list = new List<TaskAssigneeMapping>();
-            List<TaskAssigneeMapping> remove = _taskManagementContext.TaskAssigneeMapping.Where(find => find.TaskId == tasks.Id && find.IsActive == true).ToList();
+            List<TaskAssigneeMapping> remove = _taskManagementContext.TaskAssigneeMapping.Where(find => find.TaskId == tasks.Id && find.IsActive ).ToList();
             _taskManagementContext.TaskAssigneeMapping.RemoveRange(remove);
             _taskManagementContext.Tasks.Update(tasks);
            
@@ -263,7 +252,7 @@ namespace TaskManagement.Repository
         public bool DeleteTask(Guid id)
         {
             List<Tasks> task = _taskManagementContext.Tasks.Include(term => term.TaskMapAssignee).Where(find => find.Id == id 
-            || find.ParentTaskId == id && find.IsActive == true).ToList();
+            || find.ParentTaskId == id && find.IsActive ).ToList();
             if (task.Count() == 0)
             {
                 return false;
@@ -273,11 +262,11 @@ namespace TaskManagement.Repository
                 item.IsActive = false;
                 item.UpdatedDate = DateTime.Now;
                 item.UpdatedBy = item.Assigner;
-                foreach (TaskAssigneeMapping each in item.TaskMapAssignee)
+                foreach (TaskAssigneeMapping term in item.TaskMapAssignee)
                 {
-                    each.IsActive = false;
-                    each.UpdatedDate = DateTime.Now;
-                    each.UpdatedBy = item.Id;
+                    term.IsActive = false;
+                    term.UpdatedDate = DateTime.Now;
+                    term.UpdatedBy = item.Id;
                 }
             }
             _taskManagementContext.Tasks.UpdateRange(task);
@@ -291,17 +280,25 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool IsStatusIdFound(Guid id)
         {
-            return _taskManagementContext.RefTerm.Any(sel => sel.Id == id && sel.IsActive == true);
+            return _taskManagementContext.RefTerm.Any(sel => sel.Id == id && sel.IsActive );
         }
 
         ///<summary>
         /// Updates Task status
         ///</summary>
-        public void UpdateStatus(Guid id,Guid statusId)
+        public void UpdateStatus(Guid id,Guid statusId, Guid userId)
         {
-            Tasks task = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive == true).First();
+            Tasks task = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive ).First();
             task.Status = statusId;
             task.UpdatedDate = DateTime.Now;
+            if(userId == Guid.Empty)
+            {
+                task.Status = statusId;
+            }
+            else
+            {
+                task.ReminderPeriodId = statusId;
+            }
             task.UpdatedBy = task.Assigner;
             _taskManagementContext.SaveChanges();
         }
@@ -309,14 +306,12 @@ namespace TaskManagement.Repository
         ///<summary>
         /// Updates Task remainder
         ///</summary>
-        public void UpdateReminder(Guid id, Guid reminderId)
-        {
-            Tasks task = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive == true).First();
-            task.ReminderPeriodId = reminderId;
-            task.UpdatedDate = DateTime.Now;
-            task.UpdatedBy = task.Assigner;
-            _taskManagementContext.SaveChanges();
-        }
+        //public void UpdateReminderId(Guid id, Guid reminderId)
+        //{
+        //    Tasks task = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive ).First();
+   
+        //    _taskManagementContext.SaveChanges();
+        //}
 
         ///<summary>
         /// Gets list of Assginee 
@@ -324,7 +319,7 @@ namespace TaskManagement.Repository
         ///<return>List<Assignee></return>
         public List<User> GetAllAssignee()
         {
-            return _taskManagementContext.User.Where(find => find.IsActive == true).ToList();
+            return _taskManagementContext.User.Where(find => find.IsActive ).ToList();
         }
 
         ///<summary>
@@ -333,7 +328,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool IsAssignerExist(Guid id)
         {
-            return _taskManagementContext.User.Any(find => find.Id == id && find.IsActive == true);
+            return _taskManagementContext.User.Any(find => find.Id == id && find.IsActive );
         }
 
         ///<summary>
@@ -342,7 +337,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool CheckParentTaskId(Guid id)
         {
-            return _taskManagementContext.Tasks.Any(find => find.Id == id && find.IsActive == true);
+            return _taskManagementContext.Tasks.Any(find => find.Id == id && find.IsActive );
         }
 
         ///<summary>
@@ -351,7 +346,7 @@ namespace TaskManagement.Repository
         ///<return>Tasks</return>
         public Tasks IsParentTaskDatesValid(string end, string start, Guid parentTaskId)
         {
-            return  _taskManagementContext.Tasks.Where(find => find.Id == parentTaskId && find.IsActive == true).FirstOrDefault();
+            return  _taskManagementContext.Tasks.Where(find => find.Id == parentTaskId && find.IsActive ).FirstOrDefault();
         }
 
 
@@ -361,7 +356,7 @@ namespace TaskManagement.Repository
         ///<return>Tasks</return>
         public Tasks GetParentTask(Guid id)
         {
-            Guid taskId = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive == true).Select(sel => sel.ParentTaskId).FirstOrDefault();
+            Guid taskId = _taskManagementContext.Tasks.Where(find => find.Id == id && find.IsActive ).Select(sel => sel.ParentTaskId).FirstOrDefault();
             if(taskId == null)
             {
                 return null;
@@ -375,7 +370,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool CheckUserName(string email)
         {
-            return _taskManagementContext.User.Any(sel => sel.Email == email && sel.IsActive == true);
+            return _taskManagementContext.User.Any(sel => sel.Email == email && sel.IsActive );
         }
 
         ///<summary>
@@ -384,7 +379,7 @@ namespace TaskManagement.Repository
         ///<return>bool</return>
         public bool CheckPhone(string phone)
         {
-            return _taskManagementContext.User.Any(sel => sel.Phone == phone && sel.IsActive == true);
+            return _taskManagementContext.User.Any(sel => sel.Phone == phone && sel.IsActive );
         }
 
         ///<summary>
@@ -403,7 +398,7 @@ namespace TaskManagement.Repository
         ///<return>Guid</return>
         public Guid GetId(string email)
         {
-            return _taskManagementContext.User.Where(find => find.Email == email && find.IsActive == true).Select(sel => sel.Id).FirstOrDefault();
+            return _taskManagementContext.User.Where(find => find.Email == email && find.IsActive ).Select(sel => sel.Id).FirstOrDefault();
         }
 
         ///<summary>
@@ -412,7 +407,7 @@ namespace TaskManagement.Repository
         ///<return>Guid</return>
         public Guid GetStatusId()
         {
-            return _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Open && sel.IsActive == true).Select(fin => fin.Id).First();
+            return _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Open && sel.IsActive ).Select(fin => fin.Id).First();
         }
 
         ///<summary>
@@ -421,25 +416,25 @@ namespace TaskManagement.Repository
         ///<return>Guid</return>
         public Guid GetPriorityId()
         {
-            return _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Low && sel.IsActive == true).Select(sel => sel.Id).First();
+            return _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Low && sel.IsActive ).Select(sel => sel.Id).First();
         }
 
         public List<Tasks> GetTaskList(Guid id)
         {
-            Guid status = _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Complete && sel.IsActive == true).Select(sel => sel.Id).First();
+            Guid status = _taskManagementContext.RefTerm.Where(sel => sel.Key == Constants.Complete && sel.IsActive ).Select(sel => sel.Id).First();
             
 
-            return _taskManagementContext.Tasks.Where(find => find.Assigner == id && find.ReminderPeriodId != Guid.Empty && find.DueDate != DateTime.MinValue && find.Status != status && find.IsActive == true).ToList();
+            return _taskManagementContext.Tasks.Where(find => find.Assigner == id && find.ReminderPeriodId != Guid.Empty && find.DueDate != DateTime.MinValue && find.Status != status && find.IsActive ).ToList();
         }
 
         public List<RefTerm> GetRefTermDays()
         {
-            return _taskManagementContext.RefTerm.Where(find => find.Key == Constants.days_3 || find.Key == Constants.days_7 && find.IsActive == true).ToList();
+            return _taskManagementContext.RefTerm.Where(find => find.Key == Constants.days_3 || find.Key == Constants.days_7 && find.IsActive ).ToList();
         }
 
         public string GetReminderDays(Guid id)
         {
-            return _taskManagementContext.RefTerm.Where(find => find.IsActive == true && find.Id == id).Select(sel => sel.Key).First();
+            return _taskManagementContext.RefTerm.Where(find => find.IsActive  && find.Id == id).Select(sel => sel.Key).First();
         }
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TaskManagement.Models;
 
 namespace TaskManagement.Migrations
 {
     [DbContext(typeof(TaskManagementContext))]
-    partial class TaskManagementContextModelSnapshot : ModelSnapshot
+    [Migration("20230130124013_new")]
+    partial class @new
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,11 +27,11 @@ namespace TaskManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -40,11 +42,11 @@ namespace TaskManagement.Migrations
                     b.Property<string>("Key")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -54,35 +56,35 @@ namespace TaskManagement.Migrations
                         new
                         {
                             Id = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 557, DateTimeKind.Local).AddTicks(8036),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(7964),
                             Description = "priority",
                             IsActive = true,
                             Key = "PRIORITY",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 557, DateTimeKind.Local).AddTicks(8188),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(8157),
                             Description = "status",
                             IsActive = true,
                             Key = "STATUS",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("e28e09d8-76f8-43ba-be0b-d7eade3b1e6b"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 557, DateTimeKind.Local).AddTicks(8198),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(8175),
                             Description = "remainder",
                             IsActive = true,
                             Key = "REMINDER_PERIOD",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -92,11 +94,11 @@ namespace TaskManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -107,11 +109,11 @@ namespace TaskManagement.Migrations
                     b.Property<string>("Key")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -121,90 +123,90 @@ namespace TaskManagement.Migrations
                         new
                         {
                             Id = new Guid("246b7c06-f7b8-49e6-873c-fcc337c2056a"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 547, DateTimeKind.Local).AddTicks(6880),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 990, DateTimeKind.Local).AddTicks(6405),
                             Description = "high",
                             IsActive = true,
                             Key = "HIGH",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("65a9194f-6e36-4451-ac6b-f8c3e2f2a794"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 549, DateTimeKind.Local).AddTicks(6809),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 992, DateTimeKind.Local).AddTicks(6961),
                             Description = "medium",
                             IsActive = true,
                             Key = "MEDIUM",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("d2c7f6ed-174f-4782-8207-ca847cb5e5ad"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 549, DateTimeKind.Local).AddTicks(6894),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 992, DateTimeKind.Local).AddTicks(7049),
                             Description = "low",
                             IsActive = true,
                             Key = "LOW",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("031feee7-02c4-43f7-9269-b777ae5558d4"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 549, DateTimeKind.Local).AddTicks(6909),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 992, DateTimeKind.Local).AddTicks(7063),
                             Description = "open",
                             IsActive = true,
                             Key = "OPEN",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("5443d3e4-1cc2-49f9-af36-ec46c00c8844"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 549, DateTimeKind.Local).AddTicks(6920),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 992, DateTimeKind.Local).AddTicks(7075),
                             Description = "inprogress",
                             IsActive = true,
-                            Key = "INPROGRESS",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            Key = "IN_PROGRESS",
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("09cd2a9b-a3ef-4487-a37c-e076569cf752"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 549, DateTimeKind.Local).AddTicks(6938),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 992, DateTimeKind.Local).AddTicks(7094),
                             Description = "completed",
                             IsActive = true,
                             Key = "COMPLETED",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 549, DateTimeKind.Local).AddTicks(6948),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 992, DateTimeKind.Local).AddTicks(7106),
                             Description = "3 days",
                             IsActive = true,
                             Key = "3_DAYS",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = new Guid("cd2a89f8-dd1a-4a62-8802-1ec27c2c3980"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 549, DateTimeKind.Local).AddTicks(6957),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 992, DateTimeKind.Local).AddTicks(7117),
                             Description = "7 days",
                             IsActive = true,
                             Key = "7_DAYS",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -214,11 +216,11 @@ namespace TaskManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -229,11 +231,11 @@ namespace TaskManagement.Migrations
                     b.Property<Guid>("RefTermId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -246,91 +248,91 @@ namespace TaskManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("953b4148-1ea5-4a18-94d9-c7ac420114ac"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8173),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("4dc3c87f-be60-4f6e-a889-30b9b2117891"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(483),
                             IsActive = true,
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("246b7c06-f7b8-49e6-873c-fcc337c2056a"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("3422f08e-46aa-4d7f-a0b8-7f5891e279bf"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8330),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("95f84c92-2979-4aca-b4df-fd14934ce72c"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(706),
                             IsActive = true,
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("65a9194f-6e36-4451-ac6b-f8c3e2f2a794"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("7a9f9cc6-520c-4bf8-b663-87c7968e65ff"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8344),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("dc4af45a-79de-4820-8c3c-de017d82cdda"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(729),
                             IsActive = true,
                             RefSetId = new Guid("1966d5cb-a92b-4ee9-9e5c-de08c2f7025b"),
                             RefTermId = new Guid("d2c7f6ed-174f-4782-8207-ca847cb5e5ad"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("e5fefc85-5e26-48b6-a57d-7dcc6f399644"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8355),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("67c5bd23-e692-44c3-a53e-e70f52d6e2c8"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(893),
                             IsActive = true,
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("031feee7-02c4-43f7-9269-b777ae5558d4"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("c8166cc9-8343-4ade-a08b-a5f955379ebd"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8365),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("2daa8de1-34fa-4e6c-8485-8b0a63c4240d"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(909),
                             IsActive = true,
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("5443d3e4-1cc2-49f9-af36-ec46c00c8844"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("d90e89dc-ca27-4b0e-9f02-f62d1642f31c"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8381),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("bfc296e6-98db-4844-93d0-4a93a487d87f"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(932),
                             IsActive = true,
                             RefSetId = new Guid("3b61dc28-b562-4153-a302-97866324806c"),
                             RefTermId = new Guid("09cd2a9b-a3ef-4487-a37c-e076569cf752"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("8ae5de6a-eefc-4005-93d5-d8734aca93bc"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8390),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("8c707238-3700-4cf2-9e3e-9064c69d1c97"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(965),
                             IsActive = true,
                             RefSetId = new Guid("e28e09d8-76f8-43ba-be0b-d7eade3b1e6b"),
                             RefTermId = new Guid("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("e0557501-ad15-4180-9e0b-744c98340c99"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 556, DateTimeKind.Local).AddTicks(8418),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("edeab0e9-5bc0-4603-9958-102be8733aad"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 12, 996, DateTimeKind.Local).AddTicks(978),
                             IsActive = true,
                             RefSetId = new Guid("e28e09d8-76f8-43ba-be0b-d7eade3b1e6b"),
                             RefTermId = new Guid("cd2a89f8-dd1a-4a62-8802-1ec27c2c3980"),
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
@@ -343,11 +345,11 @@ namespace TaskManagement.Migrations
                     b.Property<Guid>("AssigneeId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -358,11 +360,11 @@ namespace TaskManagement.Migrations
                     b.Property<Guid?>("TasksId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -380,11 +382,11 @@ namespace TaskManagement.Migrations
                     b.Property<Guid>("Assigner")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -413,11 +415,11 @@ namespace TaskManagement.Migrations
                     b.Property<Guid>("Status")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -430,11 +432,11 @@ namespace TaskManagement.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -451,11 +453,11 @@ namespace TaskManagement.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -464,26 +466,26 @@ namespace TaskManagement.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("18c7e0aa-45ef-411f-b9e4-a5d72dbd0e73"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 565, DateTimeKind.Local).AddTicks(9820),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("aaa91bab-bac7-40b0-ad47-94bd2cbc7beb"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 13, 3, DateTimeKind.Local).AddTicks(6683),
                             Email = "psurya@gmail.com",
                             IsActive = true,
                             Password = "o4UhjEI94IFLPSGjPrdplj3C1Z9g+z7tDY3/2ZedF1c=",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
-                            Id = new Guid("08757d54-7892-4064-934b-886a31d5f783"),
-                            CreatedDate = new DateTime(2023, 1, 27, 17, 56, 20, 566, DateTimeKind.Local).AddTicks(1025),
-                            CreatedId = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Id = new Guid("796c0da6-d397-40b9-be76-a68a57e3bd4c"),
+                            CreatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            CreatedDate = new DateTime(2023, 1, 30, 18, 10, 13, 3, DateTimeKind.Local).AddTicks(7926),
                             Email = @"
 test@gmail.com",
                             IsActive = true,
                             Password = "o4UhjEI94IFLPSGjPrdplj3C1Z9g+z7tDY3/2ZedF1c=",
-                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            UpdatedId = new Guid("00000000-0000-0000-0000-000000000000")
+                            UpdatedBy = new Guid("00000000-0000-0000-0000-000000000000"),
+                            UpdatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 

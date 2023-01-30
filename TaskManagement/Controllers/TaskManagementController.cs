@@ -268,6 +268,8 @@ namespace TaskManagement.Controllers
         [Route("api/task/{id}/reminder")]
         public IActionResult UpdateReminder([FromRoute]Guid id,[FromBody] ReminderDTO reminderDTO )
         {
+            
+           
             _logger.LogInformation("Update task reminder started");
             if (!ModelState.IsValid)
             {

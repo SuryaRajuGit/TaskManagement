@@ -32,6 +32,8 @@ namespace UnitTest_TaskManagement
         byte[] key = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
         byte[] iv = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
         private readonly TaskManagementContext _context;
+
+
         public UnitTest1()
         {
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder().
@@ -54,7 +56,7 @@ namespace UnitTest_TaskManagement
             _mapper = mapper;
             Claim claim1 = new Claim("userId", "9dc4391c-6967-43c0-93dd-cfb0ac6efb46", "", "LOCAL AUTHORITY");
 
-            ClaimsIdentity identity = new ClaimsIdentity(new[] { claim1 }, "BasicAuthentication"); 
+            ClaimsIdentity identity = new ClaimsIdentity(new[] { claim1 }, "BasicAuthentication");
             ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
             GenericIdentity identityy = new GenericIdentity("some name", "test");
@@ -79,7 +81,8 @@ namespace UnitTest_TaskManagement
         }
         public void AddData()
         {
-            string refTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefTermData.csv";
+
+            string refTermPath = @"..\..\..\..\TaskManagement\Entities\Migrations\Files\RefTermData.csv";
             string refTermCSV = File.ReadAllText(refTermPath);
             string[] RefTermdata = refTermCSV.Split('\r');
             List<RefTerm> list = new List<RefTerm>();
@@ -89,10 +92,9 @@ namespace UnitTest_TaskManagement
                 RefTerm refObj = new RefTerm { Id = Guid.Parse(row[0]), Key = row[1].ToString(), Description = row[2].ToString(), IsActive = true };
                 list.Add(refObj);
             }
-
             _context.RefTerm.AddRange(list);
 
-            string refSetTermPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefSetTerm.csv";
+            string refSetTermPath = @"..\..\..\..\TaskManagement\Entities\Migrations\Files\RefSetTerm.csv";
             string refSetTermCSV = File.ReadAllText(refSetTermPath);
             string[] RefSetTermdata = refSetTermCSV.Split('\r');
             List<SetRefTerm> SetRefTermlist = new List<SetRefTerm>();
@@ -104,7 +106,9 @@ namespace UnitTest_TaskManagement
             }
             _context.AddRange(SetRefTermlist);
 
-            string refSetPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\RefSetData.csv";
+
+
+            string refSetPath = @"..\..\..\..\TaskManagement\Entities\Migrations\Files\RefSetData.csv";
             string refSetCSV = File.ReadAllText(refSetPath);
             string[] refSetdata = refSetCSV.Split('\r');
             List<RefSet> refSetList = new List<RefSet>();
@@ -115,10 +119,8 @@ namespace UnitTest_TaskManagement
                 refSetList.Add(refObj);
             }
             _context.RefSet.AddRange(refSetList);
-
-
-            string loginPath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\LoginData.csv";
-            string loginCSV = File.ReadAllText(loginPath);
+            string path = @"..\..\..\..\TaskManagement\Entities\Migrations\Files\LoginData.csv";
+            string loginCSV = File.ReadAllText(path);
             string[] LoginData = loginCSV.Split('\r');
             List<User> LoginList = new List<User>();
             foreach (string item in LoginData)
@@ -142,7 +144,7 @@ namespace UnitTest_TaskManagement
             }
             _context.User.AddRange(LoginList);
 
-            string taskDatePath = @"C:\Users\Hp\source\repos\TaskManagement\TaskManagement\Entities\Migrations\Files\TaskData.csv";
+            string taskDatePath = @"..\..\..\..\TaskManagement\Entities\Migrations\Files\TaskData.csv";
             string taskCSV = File.ReadAllText(taskDatePath);
             string[] taskData = taskCSV.Split('\r');
             int c = 0;
@@ -173,6 +175,13 @@ namespace UnitTest_TaskManagement
                     ReminderPeriodId = row[11] != "" ? Guid.Parse(row[11]) : Guid.Empty,
                     IsActive = true
                 };
+                if (row[11] != "")
+                {
+                    DateTime datetime = DateTime.Now;
+                    tasks.DueDate = datetime.AddDays(1);
+
+                    tasks.StartDate = datetime.AddDays(-1);
+                }
                 if (c == 0)
                 {
                     tasks.ParentTaskId = Guid.Parse("931714f8-da93-42ec-85fe-bf5175bd30f5");
@@ -225,18 +234,40 @@ namespace UnitTest_TaskManagement
 
                 Assignee = guids,
             };
+            CreateTaskDTO createTaskDTO1 = new CreateTaskDTO()
+            {
+                Name = "name",
+                Description = "test",
+                DueDate = "09/02/2023 03:00:00",
+                StartDate = "08/02/2023 03:00:00",
+                Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
+                Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
+
+                Assignee = guids,
+            };
             IActionResult response = _taskManagementController.CreateTask(createTaskDTO);
+            IActionResult response1 = _taskManagementController.CreateTask(createTaskDTO);
+
             ObjectResult result = Assert.IsType<ObjectResult>(response);
+            ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+
             Assert.Equal(201, result.StatusCode);
+            Assert.Equal(409, result1.StatusCode);
         }
 
         [Fact]
         public void Test_GetMetaDataList()
         {
             string key = "STATUS";
+            string key1 = "STATU";
             IActionResult response = _taskManagementController.GetMetaDataList(key);
+            IActionResult response1 = _taskManagementController.GetMetaDataList(key1);
+
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
+            NotFoundObjectResult result1 = Assert.IsType<NotFoundObjectResult>(response1);
+
             Assert.Equal(200, result.StatusCode);
+            Assert.Equal(404, result1.StatusCode);
         }
 
         [Fact]
@@ -244,10 +275,13 @@ namespace UnitTest_TaskManagement
         {
             IActionResult response = _taskManagementController.GetTaskDetails(Guid.Parse("9dc4391c-6967-43c0-93dd-cfb0ac6efb46"), "Name", "ASC", 5, 1);
             IActionResult response1 = _taskManagementController.GetTaskDetails(Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1"), "Name", "DSC", 5, 1);
+            IActionResult response2 = _taskManagementController.GetTaskDetails(Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c2"), "Name", "DSC", 5, 1);
 
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
             ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+            ObjectResult result2 = Assert.IsType<ObjectResult>(response2);
 
+            Assert.Equal(404, result2.StatusCode);
             Assert.Equal(204, result1.StatusCode);
             Assert.Equal(200, result.StatusCode);
         }
@@ -255,14 +289,14 @@ namespace UnitTest_TaskManagement
         public void Test_GetSingleTask()
         {
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
-            Guid id1 = Guid.Parse("931714f8-da93-42ec-85fe-bf5175bd30f5");
+            Guid id2 = Guid.Parse("931714f8-da93-42ec-85fe-bf5175bd30f9");
             IActionResult response = _taskManagementController.GetSingleTask(id);
-            IActionResult response1 = _taskManagementController.GetSingleTask(id1);
+            IActionResult response2 = _taskManagementController.GetSingleTask(id2);
 
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
-            OkObjectResult result1 = Assert.IsType<OkObjectResult>(response1);
+            ObjectResult result2 = Assert.IsType<ObjectResult>(response2);
 
-            Assert.Equal(200, result1.StatusCode);
+            Assert.Equal(404, result2.StatusCode);
             Assert.Equal(200, result.StatusCode);
         }
         [Fact]
@@ -278,7 +312,6 @@ namespace UnitTest_TaskManagement
                 StartDate = "03/02/2023 06:32:00",
                 Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
-
                 Assignee = guids,
             };
             UpdateTaskDTO updateTaskDTO1 = new UpdateTaskDTO()
@@ -293,13 +326,17 @@ namespace UnitTest_TaskManagement
                 Assignee = guids,
             };
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
+            Guid id1 = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2f2");
 
             IActionResult response = _taskManagementController.UpdateTask(id, updateTaskDTO);
             IActionResult response1 = _taskManagementController.UpdateTask(id, updateTaskDTO1);
+            IActionResult response2 = _taskManagementController.UpdateTask(id1, updateTaskDTO);
 
+            ObjectResult result2 = Assert.IsType<ObjectResult>(response2);
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
             BadRequestObjectResult result1 = Assert.IsType<BadRequestObjectResult>(response1);
 
+            Assert.Equal(404, result2.StatusCode);
             Assert.Equal(200, result.StatusCode);
             Assert.Equal(400, result1.StatusCode);
         }
@@ -307,9 +344,16 @@ namespace UnitTest_TaskManagement
         public void Test_DeleteTask()
         {
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
+            Guid id1 = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c2");
+
             IActionResult response = _taskManagementController.DeleteTask(id);
+            IActionResult response1 = _taskManagementController.DeleteTask(id1);
+
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
+            ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+
             Assert.Equal(200, result.StatusCode);
+            Assert.Equal(404, result1.StatusCode);
         }
         [Fact]
         public void Test_UpdateStatus()
@@ -319,15 +363,24 @@ namespace UnitTest_TaskManagement
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844")
             };
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
+            Guid id1 = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c2");
+
             IActionResult response = _taskManagementController.UpdateStatus(id, statusDTO);
+            IActionResult response1 = _taskManagementController.UpdateStatus(id1, statusDTO);
+
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
+            ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+
             Assert.Equal(200, result.StatusCode);
+            Assert.Equal(404, result1.StatusCode);
         }
         [Fact]
         public void Test_GetAssigneeList()
         {
             IActionResult response = _taskManagementController.GetAssigneeList();
+
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
+
             Assert.Equal(200, result.StatusCode);
         }
         [Fact]
@@ -350,6 +403,7 @@ namespace UnitTest_TaskManagement
             IActionResult response = _taskManagementController.SignUp(signUpDTO);
             IActionResult response1 = _taskManagementController.SignUp(signUpDTO1);
 
+
             ObjectResult result = Assert.IsType<ObjectResult>(response);
             ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
 
@@ -360,10 +414,30 @@ namespace UnitTest_TaskManagement
         public void Test_GetRemainders()
         {
             IActionResult response = _taskManagementController.GetReminder();
-
             ObjectResult result = Assert.IsType<ObjectResult>(response);
+            Assert.Equal(200, result.StatusCode);
+        }
+        [Fact]
+        public void Test_UpdateRemainder()
+        {
+            ReminderDTO reminderDTO = new ReminderDTO()
+            {
+                ReminderPeriodId = Guid.Parse("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2")
+            };
+            ReminderDTO reminderDTO1 = new ReminderDTO()
+            {
+                ReminderPeriodId = Guid.Parse("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2")
+            };
+            Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
+            Guid id1 = Guid.Parse("931714f8-da93-42ec-85fe-bf5175bd30f5");
+            IActionResult response = _taskManagementController.UpdateReminder(id1, reminderDTO);
+            IActionResult response1 = _taskManagementController.UpdateReminder(id, reminderDTO1);
 
-            Assert.Equal(204, result.StatusCode);
+            OkObjectResult result = Assert.IsType<OkObjectResult>(response);
+            ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+
+            Assert.Equal(200, result.StatusCode);
+            Assert.Equal(400, result1.StatusCode);
         }
     }
 }

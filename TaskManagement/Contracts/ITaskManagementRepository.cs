@@ -119,12 +119,12 @@ namespace TaskManagement.Contracts
         ///<summary>
         /// Updates Task status
         ///</summary>
-        public void UpdateStatus(Guid id,Guid userId);
+        public void UpdateStatus(Guid id,Guid userId,Guid statusId);
 
         ///<summary>
         /// Updates Task remainder
         ///</summary>
-        public void UpdateReminder(Guid id, Guid reminderId);
+       // public void UpdateReminderId(Guid id, Guid reminderId,Guid userId);
 
         ///<summary>
         /// Gets list of Assginee 

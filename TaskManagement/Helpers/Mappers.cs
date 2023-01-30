@@ -26,6 +26,16 @@ namespace TaskManagement.Helpers
 
             CreateMap<User, AssigneeDTO>().ReverseMap();
             CreateMap<User, SignUpDTO>().ReverseMap();
+
+            CreateMap<MetaDataResponse, RefTerm>().ReverseMap();
+
+            CreateMap<AssigneeDTO, User>().ReverseMap();
+
+            CreateMap<ReminderResponseDTO, Tasks>().ReverseMap()
+                .ForMember(fin => fin.TaskId,sel=>sel.MapFrom(act=>act.Id))
+                .ForMember(fin => fin.ReminderMessage,sel=>sel.MapFrom(act=> $"Task due date {act.DueDate}"));
+
+            CreateMap<TaskAssigneeMapping, TaskAssigneeMapping>().ReverseMap();
         }
     }
 }

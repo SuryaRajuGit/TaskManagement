@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TaskManagement.Contracts;
 using TaskManagement.Entities.Dtos;
+using TaskManagement.Helpers;
 using TaskManagement.Models;
 
 namespace TaskManagement.Repository
@@ -12,9 +14,12 @@ namespace TaskManagement.Repository
     public class TaskManagementRepository : ITaskManagementRepository
     {
         private readonly TaskManagementContext _taskManagementContext;
-        public TaskManagementRepository(TaskManagementContext taskManagementContext)
+        private readonly IMapper _mapper;
+
+        public TaskManagementRepository(TaskManagementContext taskManagementContext, IMapper mapper)
         {
             _taskManagementContext = taskManagementContext;
+            _mapper = mapper;
         }
 
         ///<summary>
@@ -172,16 +177,18 @@ namespace TaskManagement.Repository
         public Tasks GetTask(Guid id)
         {
             Tasks task = _taskManagementContext.Tasks.Include(sel => sel.TaskMapAssignee).Where(fin => fin.IsActive == true && fin.Id == id).First();
-            task.TaskMapAssignee = 
-            task.TaskMapAssignee.Where(fin => fin.IsActive == true).Select(sel => new TaskAssigneeMapping { 
-                IsActive=sel.IsActive,
-                AssigneeId=sel.AssigneeId,
-                CreatedDate=sel.CreatedDate,
-                CreatedId=sel.CreatedId,
-                Id=sel.Id,
-                TaskId=sel.TaskId,
-                UpdatedDate=sel.UpdatedDate,
-                UpdatedId=sel.UpdatedId
+            task.TaskMapAssignee =
+            task.TaskMapAssignee.Where(fin => fin.IsActive == true).Select(sel =>
+            new TaskAssigneeMapping
+            {
+                IsActive = sel.IsActive,
+                AssigneeId = sel.AssigneeId,
+                CreatedDate = sel.CreatedDate,
+                CreatedId = sel.CreatedId,
+                Id = sel.Id,
+                TaskId = sel.TaskId,
+                UpdatedDate = sel.UpdatedDate,
+                UpdatedId = sel.UpdatedId
             }).ToList();
             return task;
                 

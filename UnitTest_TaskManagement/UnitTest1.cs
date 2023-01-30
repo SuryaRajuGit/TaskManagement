@@ -54,7 +54,7 @@ namespace UnitTest_TaskManagement
             _mapper = mapper;
             Claim claim1 = new Claim("userId", "9dc4391c-6967-43c0-93dd-cfb0ac6efb46", "", "LOCAL AUTHORITY");
 
-            ClaimsIdentity identity = new ClaimsIdentity(new[] { claim1 }, "BasicAuthentication"); // this uses basic auth
+            ClaimsIdentity identity = new ClaimsIdentity(new[] { claim1 }, "BasicAuthentication"); 
             ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
             GenericIdentity identityy = new GenericIdentity("some name", "test");
@@ -64,7 +64,6 @@ namespace UnitTest_TaskManagement
                 User = contextUser
             };
 
-            //Controller needs a controller context to access HttpContext
             HttpContextAccessor _httpContextAccessor = new HttpContextAccessor()
             {
                 HttpContext = httpContext
@@ -245,7 +244,6 @@ namespace UnitTest_TaskManagement
         {
             IActionResult response = _taskManagementController.GetTaskDetails(Guid.Parse("9dc4391c-6967-43c0-93dd-cfb0ac6efb46"), "Name", "ASC", 5, 1);
             IActionResult response1 = _taskManagementController.GetTaskDetails(Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1"), "Name", "DSC", 5, 1);
-            //IActionResult response1 = _taskManagementController.GetTaskDetails(Guid.Parse("e87f391c-e655-4d72-be4f-e14c0464f6e6"), "DueDate", "DSC", 5, 1);
 
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
             ObjectResult result1 = Assert.IsType<ObjectResult>(response1);

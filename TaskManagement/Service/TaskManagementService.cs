@@ -106,18 +106,10 @@ namespace TaskManagement.Service
             {
                 return null;
             }
-            List<MetaDataResponse> responseList = new List<MetaDataResponse>();
-            foreach (RefTerm item in refTerm)
-            {
-                MetaDataResponse response = new MetaDataResponse
-                {
-                    Id = item.Id.ToString(),
-                    Key = item.Key,
-                    Description = item.Description
-                };
-                responseList.Add(response);
-            }
-            return responseList;
+
+            List<MetaDataResponse> destinationList = _mapper.Map<List<MetaDataResponse>>(refTerm);
+
+            return destinationList;
         }
 
         ///<summary>
@@ -219,15 +211,10 @@ namespace TaskManagement.Service
         ///</summary>
         public List<GetTaskDTO> GetTaskList(Guid id, int size, int pageNo, string sortOrder, string sortBy  )
         {
-            if(sortOrder == null)
-            {
-                sortOrder = Constants.ASC;
-            }
-            if(sortBy == null)
-            {
-                sortBy = Constants.Name;
-            }
-            // Gets list of paginated tasks
+            sortOrder = sortOrder == null ? Constants.ASC : sortOrder;
+
+            sortBy = sortBy == null ? Constants.Name : sortBy;
+
             List<Tasks> paginatedList = _taskManagementRepository.GetTaskList( id,  size,  pageNo);
             List<Tasks> sortList = new List<Tasks>();
             if (paginatedList.Count() == 0)
@@ -238,34 +225,13 @@ namespace TaskManagement.Service
             switch (sortBy)
             {
                 case Constants.Name:
-                    if(sortOrder == Constants.DSC)
-                    {
-                        sortList = paginatedList.OrderByDescending(item => item.Name).ToList();
-                    }
-                    else
-                    {
-                        sortList = paginatedList.OrderBy(item => item.Name).ToList();
-                    }
+                    sortList = sortOrder == Constants.DSC ? paginatedList.OrderByDescending(item => item.Name).ToList() : paginatedList.OrderBy(item => item.Name).ToList();
                     break;
-                case Constants.DueDate: 
-                    if(sortOrder == Constants.DSC)
-                    {
-                        sortList = paginatedList.OrderByDescending(item => item.DueDate).ToList();
-                    }
-                    else
-                    {
-                        sortList = paginatedList.OrderBy(item => item.DueDate).ToList();
-                    }
+                case Constants.DueDate:
+                    sortList = sortOrder == Constants.DSC ? paginatedList.OrderByDescending(item => item.DueDate).ToList() : paginatedList.OrderBy(item => item.DueDate).ToList();
                     break;
-                case Constants.Status: 
-                    if(sortOrder == Constants.DSC)
-                    {
-                        sortList = paginatedList.OrderByDescending(item => item.Status).ToList();
-                    }
-                    else
-                    {
-                        sortList = paginatedList.OrderBy(item => item.Status).ToList();
-                    }
+                case Constants.Status:
+                    sortList = sortOrder == Constants.DSC ? paginatedList.OrderByDescending(item => item.Status).ToList() : paginatedList.OrderBy(item => item.Status).ToList();
                     break;
                 default:
                     sortList = paginatedList;
@@ -310,6 +276,7 @@ namespace TaskManagement.Service
             // Gets assigner name
             getSingleTaskDTO.Assigner = _taskManagementRepository.GetAssigner(task.Assigner);
             List<SubTaskDTO> subTaskList = new List<SubTaskDTO>();
+
             foreach (Tasks item in subTasks)
             {
                 SubTaskDTO subTask = new SubTaskDTO()
@@ -509,12 +476,8 @@ namespace TaskManagement.Service
             {
                 return null;
             }
-            List<AssigneeDTO> list = new List<AssigneeDTO>();
-            foreach (User item in assignees)
-            {
-                AssigneeDTO assignee = _mapper.Map<AssigneeDTO>(item);
-                list.Add(assignee);
-            }
+
+            List<AssigneeDTO> list = _mapper.Map<List<AssigneeDTO>>(assignees);
             return list;
         }
 
@@ -762,16 +725,10 @@ namespace TaskManagement.Service
 
                 if(remainderDay <= currentDate)
                 {
-                    ReminderResponseDTO reminder = new ReminderResponseDTO()
-                    {
-                        Name = item.Name,
-                        TaskId = item.Id,
-                        ReminderMessage = $"Task due date {item.DueDate}"
-                    };
+                    ReminderResponseDTO reminder = _mapper.Map<ReminderResponseDTO>(item);
                     list.Add(reminder);
                 }          
             }
-
             if(list.Count() != 0)
             {
                 return list;
@@ -788,7 +745,7 @@ namespace TaskManagement.Service
             DateTime dueDate = task.DueDate;
 
             DateTime start = DateTime.Parse(startDate.ToString(Constants.Date));
-            DateTime due =DateTime.Parse(dueDate.ToString(Constants.Date));
+            DateTime due = DateTime.Parse(dueDate.ToString(Constants.Date));
 
             DateTime current = DateTime.Now;
             DateTime currentDate = DateTime.Parse(current.ToString(Constants.Date));

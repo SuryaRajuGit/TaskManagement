@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -13,23 +14,32 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TaskManagement.Contracts;
+using TaskManagement.Controllers;
 using TaskManagement.Dtos;
 using TaskManagement.Entities.Dtos;
+using TaskManagement.Helpers;
 using TaskManagement.Models;
 
 namespace TaskManagement.Service
 {
     public class TaskManagementService : ITaskManagementService
     {
-        private readonly ITaskManagementRepository _taskManagementRepository;
         private readonly IMapper _mapper;
+        private readonly ITaskManagementRepository _taskManagementRepository;
         private readonly IHttpContextAccessor _context;
         byte[] key = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
         byte[] iv = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
-        public TaskManagementService(ITaskManagementRepository taskManagementRepository, IMapper mapper, IHttpContextAccessor context)
+        public TaskManagementService(ITaskManagementRepository taskManagementRepository, IHttpContextAccessor context)
         {
-            _taskManagementRepository = taskManagementRepository;
+            MapperConfiguration mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new Mappers());
+            });
+
+            
+            IMapper mapper = mappingConfig.CreateMapper();
             _mapper = mapper;
+            _taskManagementRepository = taskManagementRepository;
             _context = context;
         }
 

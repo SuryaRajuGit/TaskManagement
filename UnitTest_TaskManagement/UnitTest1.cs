@@ -1,10 +1,13 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +15,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
+using TaskManagement;
 using TaskManagement.Controllers;
 using TaskManagement.Dtos;
 using TaskManagement.Entities.Dtos;
@@ -32,10 +36,19 @@ namespace UnitTest_TaskManagement
         byte[] key = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
         byte[] iv = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
         private readonly TaskManagementContext _context;
-
-
-        public UnitTest1()
+        private readonly ILogger _logger;
+        private readonly ApiBehaviorOptions _option;
+        public UnitTest1() 
         {
+
+            ServiceCollection services = new ServiceCollection();
+            services.AddOptions();
+            services.Configure<ApiBehaviorOptions>(o =>
+            {
+                o.SuppressModelStateInvalidFilter = true;
+            });
+            ServiceProvider serviceProvider = services.BuildServiceProvider();
+
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder().
             ConfigureLogging((builderContext, loggingBuilder) =>
             {
@@ -45,8 +58,9 @@ namespace UnitTest_TaskManagement
                 });
             });
             IHost host = hostBuilder.Build();
-            ILogger<TaskManagementController> _logger = host.Services.GetRequiredService<ILogger<TaskManagementController>>();
 
+
+            ILogger<TaskManagementController> _logger = host.Services.GetRequiredService<ILogger<TaskManagementController>>();
             MapperConfiguration mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new Mappers());
@@ -76,8 +90,9 @@ namespace UnitTest_TaskManagement
             AddData();
             _context.Database.EnsureCreated();
             _repository = new TaskManagementRepository(_context);
-            _taskManagementServices = new TaskManagementService(_repository, _mapper, _httpContextAccessor);
-            _taskManagementController = new TaskManagementController(_taskManagementServices, _logger);
+            _taskManagementServices = new TaskManagementService(_repository, _httpContextAccessor);
+            _taskManagementController = new TaskManagementController(_taskManagementServices,_logger);
+         
         }
         public void AddData()
         {
@@ -191,10 +206,26 @@ namespace UnitTest_TaskManagement
             }
             _context.SaveChanges();
         }
+        public ILogger<TaskManagementController> GetLogger()
+        {
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder().
+            ConfigureLogging((builderContext, loggingBuilder) =>
+            {
+                loggingBuilder.AddConsole((options) =>
+                {
+                    options.IncludeScopes = true;
+                });
+            });
+            IHost host = hostBuilder.Build();
+            return host.Services.GetRequiredService<ILogger<TaskManagementController>>();
+        }
 
         [Fact]
         public void Test_VerifyUser()
         {
+            ILogger<TaskManagementController> _logger = GetLogger();
+            TaskManagementController controller = new TaskManagementController(_taskManagementServices ,_logger);
+            controller.ModelState.AddModelError("error", "some error");
             LoginDTO login = new LoginDTO()
             {
                 Password = "passworD@123",
@@ -206,8 +237,17 @@ namespace UnitTest_TaskManagement
                 Password = "password@123",
 
             };
+            LoginDTO login1 = new LoginDTO()
+            {
+                Password = "passworD@123",
+               
+            };
+            
             IActionResult response = _taskManagementController.VerifyUser(login);
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
+
+            IActionResult response2 = controller.VerifyUser(login1);
+            BadRequestObjectResult result2 = Assert.IsType<BadRequestObjectResult>(response2);
 
 
             IActionResult response1 = _taskManagementController.VerifyUser(inValidlogin);
@@ -215,12 +255,17 @@ namespace UnitTest_TaskManagement
 
             Assert.Equal(401, result1.StatusCode);
             Assert.Equal(200, result.StatusCode);
+            Assert.Equal(400, result2.StatusCode);
 
         }
 
         [Fact]
         public void Test_CreateTask()
         {
+            ILogger<TaskManagementController> _logger = GetLogger();
+            TaskManagementController controller = new TaskManagementController(_taskManagementServices, _logger);
+            controller.ModelState.AddModelError("error", "some error");
+
             List<Guid> guids = new List<Guid>();
             guids.Add(Guid.Parse("9dc4391c-6967-43c0-93dd-cfb0ac6efb46"));
             CreateTaskDTO createTaskDTO = new CreateTaskDTO()
@@ -245,14 +290,27 @@ namespace UnitTest_TaskManagement
 
                 Assignee = guids,
             };
+            CreateTaskDTO createTaskDTO2 = new CreateTaskDTO()
+            {
+                Description = "test",
+                DueDate = DateTime.Parse("09/02/2023 03:00:00"),
+                StartDate = DateTime.Parse("08/02/2023 03:00:00"),
+                Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844"),
+                Priority = Guid.Parse("246B7C06-F7B8-49E6-873C-FCC337C2056A"),
+
+                Assignee = guids,
+            };
             IActionResult response = _taskManagementController.CreateTask(createTaskDTO);
             IActionResult response1 = _taskManagementController.CreateTask(createTaskDTO);
+            IActionResult response2 = controller.CreateTask(createTaskDTO2);
 
             ObjectResult result = Assert.IsType<ObjectResult>(response);
             ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+            BadRequestObjectResult result2 = Assert.IsType<BadRequestObjectResult>(response2);
 
             Assert.Equal(201, result.StatusCode);
             Assert.Equal(409, result1.StatusCode);
+            Assert.Equal(400, result2.StatusCode);
         }
 
         [Fact]
@@ -346,14 +404,17 @@ namespace UnitTest_TaskManagement
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
             Guid id1 = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c2");
 
+
             IActionResult response = _taskManagementController.DeleteTask(id);
             IActionResult response1 = _taskManagementController.DeleteTask(id1);
 
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
             ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+  
 
             Assert.Equal(200, result.StatusCode);
             Assert.Equal(404, result1.StatusCode);
+
         }
         [Fact]
         public void Test_UpdateStatus()
@@ -362,17 +423,21 @@ namespace UnitTest_TaskManagement
             {
                 Status = Guid.Parse("5443D3E4-1CC2-49F9-AF36-EC46C00C8844")
             };
+
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
             Guid id1 = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c2");
-
+            
             IActionResult response = _taskManagementController.UpdateStatus(id, statusDTO);
             IActionResult response1 = _taskManagementController.UpdateStatus(id1, statusDTO);
+
 
             OkObjectResult result = Assert.IsType<OkObjectResult>(response);
             ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
 
+
             Assert.Equal(200, result.StatusCode);
             Assert.Equal(404, result1.StatusCode);
+
         }
         [Fact]
         public void Test_GetAssigneeList()
@@ -386,6 +451,9 @@ namespace UnitTest_TaskManagement
         [Fact]
         public void Test_SignUp()
         {
+            ILogger<TaskManagementController> _logger = GetLogger();
+            TaskManagementController controller = new TaskManagementController(_taskManagementServices, _logger);
+            controller.ModelState.AddModelError("error", "some error");
             SignUpDTO signUpDTO = new SignUpDTO()
             {
                 Name = "Test Signup",
@@ -400,15 +468,24 @@ namespace UnitTest_TaskManagement
                 Email = "Test User",
                 Phone = "8142255769"
             };
+            SignUpDTO signUpDTO2 = new SignUpDTO()
+            {
+               
+                Password = "Psr@964",
+
+                Phone = "8142255769"
+            };
             IActionResult response = _taskManagementController.SignUp(signUpDTO);
             IActionResult response1 = _taskManagementController.SignUp(signUpDTO1);
-
+            IActionResult response2 = controller.SignUp(signUpDTO2);
 
             ObjectResult result = Assert.IsType<ObjectResult>(response);
             ObjectResult result1 = Assert.IsType<ObjectResult>(response1);
+            BadRequestObjectResult result2 = Assert.IsType<BadRequestObjectResult>(response2);
 
             Assert.Equal(201, result.StatusCode);
             Assert.Equal(409, result1.StatusCode);
+            Assert.Equal(400, result2.StatusCode);
         }
         [Fact]
         public void Test_GetRemainders()
@@ -420,6 +497,7 @@ namespace UnitTest_TaskManagement
         [Fact]
         public void Test_UpdateRemainder()
         {
+
             ReminderDTO reminderDTO = new ReminderDTO()
             {
                 ReminderPeriodId = Guid.Parse("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2")
@@ -428,6 +506,7 @@ namespace UnitTest_TaskManagement
             {
                 ReminderPeriodId = Guid.Parse("9e5464cf-5729-48b4-8a73-8e3fcefa4ae2")
             };
+
             Guid id = Guid.Parse("0518ba7b-ec3b-4636-a347-0fe07e03e2c1");
             Guid id1 = Guid.Parse("931714f8-da93-42ec-85fe-bf5175bd30f5");
             IActionResult response = _taskManagementController.UpdateReminder(id1, reminderDTO);

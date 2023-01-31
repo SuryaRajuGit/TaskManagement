@@ -56,7 +56,6 @@ namespace TaskManagement
                         NameClaimType = "hhhh"
                     };
                 });
-            services.AddAutoMapper(typeof(Startup));
             services.AddDbContext<TaskManagementContext>(options => options.UseSqlServer(Configuration.GetConnectionString("TaskManagement")));
             services.AddControllers();
             services.AddTransient<ITaskManagementRepository, TaskManagementRepository>();
